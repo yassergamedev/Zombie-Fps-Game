@@ -7,11 +7,15 @@ using UnityEngine;
 
 public abstract class  Interactable : MonoBehaviour
 {
+    //Add or remove an interactionEvent component to this gameObject
+    public bool useEvents;
     //message displayed to the player for interaction
     public string promptMessage;
 
     public void BaseInteract()
     {
+        if (useEvents)
+            GetComponent<InteractionEvent>().OnInteract.Invoke();
         Interact();
     }
     protected virtual void Interact()
@@ -21,5 +25,8 @@ public abstract class  Interactable : MonoBehaviour
     }
 
 
-    
+    public virtual string OnLook()
+    {
+        return promptMessage;   
+    }
 }

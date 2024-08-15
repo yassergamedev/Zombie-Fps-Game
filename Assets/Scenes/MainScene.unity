@@ -353,6 +353,7 @@ GameObject:
   - component: {fileID: 1234543295}
   - component: {fileID: 1234543294}
   - component: {fileID: 1234543293}
+  - component: {fileID: 1234543298}
   - component: {fileID: 1234543297}
   m_Layer: 7
   m_Name: Interactive
@@ -456,10 +457,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1234543292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a94f12915315e5e48acc5214a7afe7e9, type: 3}
+  m_Script: {fileID: 11500000, guid: 23476b4f8a900ff4f99be7321dfaaa24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Use Cube
+  OnInteract:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1234543298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234543292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a81ab6bc3c6f86247bf5b4ba6e8c6e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useEvents: 1
+  promptMessage: Interact
 --- !u!1 &1264230977
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,7 +708,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: '[Prompt]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -980,6 +997,7 @@ MonoBehaviour:
   crouchHeight: 1
   standingHeight: 2
   crouchTransitionSpeed: 5
+  isGrounded: 0
   groundCheck: {fileID: 1207515150}
   groundDistance: 0.4
   groundMask:

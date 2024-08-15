@@ -21,5 +21,9 @@ public class Cube : Interactable
     {
         Debug.Log("Interacted with " + gameObject.name);
     }
+    public void test()
+    {
+        Debug.Log("test");
+    }
 
 }
