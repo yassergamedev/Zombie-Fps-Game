@@ -74,7 +74,7 @@ public class PlayerHealth : MonoBehaviour
     {
         health -= damage;
         lerpTimer = 0f;
-        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1);
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0.5f);
         durationTimer = 0f;
     }
     public void RestoreHealth(float healAmount)

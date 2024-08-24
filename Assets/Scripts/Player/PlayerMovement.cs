@@ -25,7 +25,7 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerUI playerUI;
     private float currentSpeed;
-
+    public WeaponController weaponController;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -43,14 +43,26 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;  // Reset the fall velocity when grounded
         }
 
+
         // Movement input
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        // Handle Sprinting
-        if (Input.GetButton("Sprint"))
+
+        // Check if the player is moving horizontally or vertically
+        if (x != 0 || z != 0)
+        {
+            weaponController.currentWeapon.weaponAnimator.SetTrigger("Run");
+        }
+        else
+        {
+            weaponController.currentWeapon.weaponAnimator.SetTrigger("Idle");
+        }
+
+            // Handle Sprinting
+            if (Input.GetButton("Sprint"))
         {
             currentSpeed = Mathf.Lerp(currentSpeed, sprintSpeed, Time.deltaTime * 5f);  // Smoothly accelerate
         }

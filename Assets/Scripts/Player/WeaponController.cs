@@ -24,7 +24,7 @@ public class WeaponController : MonoBehaviour
     [Header("Weapon Switching")]
     public List<GameObject> weapons;
     private int currentWeaponIndex = 0;
-    private Weapon currentWeapon;
+    public Weapon currentWeapon;
     private int currentAmmo;
     private bool isReloading = false;
 

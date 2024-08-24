@@ -9,6 +9,7 @@ public class Weapon : MonoBehaviour
     public float reloadTime = 2f;
 
     public AudioClip shootSound;
+    public AudioClip reloadSound;
     public GameObject bulletHolePrefab;
     public GameObject muzzleFlashPrefab;
     public Transform muzzlePoint;
@@ -17,6 +18,7 @@ public class Weapon : MonoBehaviour
     public Animator weaponAnimator; // Optional: If each weapon has a unique animator
 
     private AudioSource audioSource;
+
 
     void Start()
     {
@@ -62,9 +64,11 @@ public class Weapon : MonoBehaviour
 
     public void Reload()
     {
+        audioSource.PlayOneShot(reloadSound);
         if (weaponAnimator != null)
         {
-            weaponAnimator.SetTrigger("Reload");
+            weaponAnimator.Play("Reload");
         }
     }
+
 }

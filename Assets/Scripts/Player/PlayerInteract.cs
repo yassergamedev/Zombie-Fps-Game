@@ -11,6 +11,7 @@ public class PlayerInteract : MonoBehaviour
     private LayerMask mask;
     private PlayerUI playerUI;
     private PlayerMovement playerMovement;
+    public int points;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +34,7 @@ public class PlayerInteract : MonoBehaviour
             
             if (hitInfo.collider.GetComponent<Interactable>() != null)
             {
+                Debug.Log("Found Interactable ");
                 Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
                 playerUI.UpdateText(interactable.promptMessage);
 
