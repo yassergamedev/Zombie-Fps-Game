@@ -25,12 +25,41 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerUI playerUI;
     private float currentSpeed;
+
     public WeaponController weaponController;
+    public Animator cameraAnimator; // Animator for the camera
+
+    // Crosshair lines
+    public RectTransform crosshairTop;
+    public RectTransform crosshairBottom;
+    public RectTransform crosshairLeft;
+    public RectTransform crosshairRight;
+
+    public float crosshairSpread = 20f; // Amount to spread the crosshair when running
+    public float crosshairFocusSpeed = 5f; // Speed of crosshair movement
+
+    private Vector2 defaultTopCrosshairPos;
+    private Vector2 defaultBotCrosshairPos;
+    private Vector2 defaultLeftCrosshairPos;
+    private Vector2 defaultRightCrosshairPos;
+
+    public GameObject weapon;
+
+    public AudioSource runningSound;
+    public AudioSource jumpSound;
     void Start()
     {
         controller = GetComponent<CharacterController>();
         playerUI = GetComponent<PlayerUI>();
         currentSpeed = walkSpeed;
+
+        weapon = GameObject.FindGameObjectWithTag("Weapon");
+
+        // Store the default positions of the crosshair lines
+        defaultTopCrosshairPos = crosshairTop.anchoredPosition;
+        defaultBotCrosshairPos = crosshairBottom.anchoredPosition;
+        defaultLeftCrosshairPos = crosshairLeft.anchoredPosition;
+        defaultRightCrosshairPos = crosshairRight.anchoredPosition;
     }
 
     void Update()
@@ -43,32 +72,49 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;  // Reset the fall velocity when grounded
         }
 
-
         // Movement input
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-
-        // Check if the player is moving horizontally or vertically
         if (x != 0 || z != 0)
         {
-            weaponController.currentWeapon.weaponAnimator.SetTrigger("Run");
+            SpreadCrosshair(crosshairSpread / 2); // Spread the crosshair lines
+            weapon.GetComponent<Animator>().ResetTrigger("Idle");
+            weapon.GetComponent<Animator>().SetTrigger("Run");
+            //weapon.GetComponent<Animator>().Play("Run");
+
+            if (!runningSound.isPlaying) // Check if the running sound is not already playing
+            {
+                runningSound.Play();
+            }
         }
         else
         {
-            weaponController.currentWeapon.weaponAnimator.SetTrigger("Idle");
+            weapon.GetComponent<Animator>().ResetTrigger("Run");
+            weapon.GetComponent<Animator>().SetTrigger("Idle");
+            
+            if (runningSound.isPlaying) // Check if the running sound is playing
+            {
+                runningSound.Stop();
+            }
         }
 
-            // Handle Sprinting
-            if (Input.GetButton("Sprint"))
+        // Handle Sprinting
+        if (Input.GetButton("Sprint"))
         {
+            
             currentSpeed = Mathf.Lerp(currentSpeed, sprintSpeed, Time.deltaTime * 5f);  // Smoothly accelerate
+            //cameraAnimator.Play("Running"); // Trigger the running animation
+            SpreadCrosshair(crosshairSpread); // Spread the crosshair lines
         }
         else
         {
+
             currentSpeed = Mathf.Lerp(currentSpeed, walkSpeed, Time.deltaTime * 5f);  // Smoothly decelerate to normal speed
+            
+            FocusCrosshair(); // Focus the crosshair lines back
         }
 
         // Crouch handling
@@ -94,10 +140,51 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            if (!jumpSound.isPlaying)
+            {
+                jumpSound.Play();
+            }
+            
         }
 
         // Apply gravity
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void SpreadCrosshair(float crosshairSpread)
+    {
+        // Spread the crosshair lines outward
+        crosshairTop.anchoredPosition = Vector2.Lerp(crosshairTop.anchoredPosition, defaultTopCrosshairPos + Vector2.up * crosshairSpread, Time.deltaTime * crosshairFocusSpeed);
+        crosshairBottom.anchoredPosition = Vector2.Lerp(crosshairBottom.anchoredPosition, defaultBotCrosshairPos + Vector2.down * crosshairSpread, Time.deltaTime * crosshairFocusSpeed);
+        crosshairLeft.anchoredPosition = Vector2.Lerp(crosshairLeft.anchoredPosition, defaultLeftCrosshairPos + Vector2.left * crosshairSpread, Time.deltaTime * crosshairFocusSpeed);
+        crosshairRight.anchoredPosition = Vector2.Lerp(crosshairRight.anchoredPosition, defaultRightCrosshairPos + Vector2.right * crosshairSpread, Time.deltaTime * crosshairFocusSpeed);
+    }
+
+    private void FocusCrosshair()
+    {
+        // Return the crosshair lines to their default positions
+        crosshairTop.anchoredPosition = Vector2.Lerp(crosshairTop.anchoredPosition, defaultTopCrosshairPos, Time.deltaTime * crosshairFocusSpeed);
+        crosshairBottom.anchoredPosition = Vector2.Lerp(crosshairBottom.anchoredPosition, defaultBotCrosshairPos, Time.deltaTime * crosshairFocusSpeed);
+        crosshairLeft.anchoredPosition = Vector2.Lerp(crosshairLeft.anchoredPosition, defaultLeftCrosshairPos, Time.deltaTime * crosshairFocusSpeed);
+        crosshairRight.anchoredPosition = Vector2.Lerp(crosshairRight.anchoredPosition, defaultRightCrosshairPos, Time.deltaTime * crosshairFocusSpeed);
+    }
+
+    public void HideCrosshair()
+    {
+        // Hide the crosshair lines when focusing
+        crosshairTop.gameObject.SetActive(false);
+        crosshairBottom.gameObject.SetActive(false);
+        crosshairLeft.gameObject.SetActive(false);
+        crosshairRight.gameObject.SetActive(false);
+    }
+
+    public void ShowCrosshair()
+    {
+        // Show the crosshair lines
+        crosshairTop.gameObject.SetActive(true);
+        crosshairBottom.gameObject.SetActive(true);
+        crosshairLeft.gameObject.SetActive(true);
+        crosshairRight.gameObject.SetActive(true);
     }
 }

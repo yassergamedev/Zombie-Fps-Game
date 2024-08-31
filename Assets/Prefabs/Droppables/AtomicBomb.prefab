@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8702767916358090840
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1553276295976632, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_Name
+      value: AtomicBomb
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 445.31226
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 19.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 456.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077806853734732, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 65017580208377820, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1553276295976632, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4176850123592872011}
+    - targetCorrespondingSourceObject: {fileID: 1553276295976632, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3020294969355803666}
+  m_SourcePrefab: {fileID: 100100000, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+--- !u!1 &8702069375624861408 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1553276295976632, guid: f9d12dec99ed04bd3bc9477611ed986b, type: 3}
+  m_PrefabInstance: {fileID: 8702767916358090840}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4176850123592872011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8702069375624861408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1519f38c5cf47c944866b288b341cb08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDropped:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3020294969355803666}
+        m_TargetAssemblyTypeName: AtomicBombDrop, Assembly-CSharp
+        m_MethodName: ActivateAtomicBomb
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &3020294969355803666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8702069375624861408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 782cb0630defb754294cbc33fa5c7acf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  atomicBombPrefab: {fileID: 2221814748544385569, guid: 5047f5a813711784fb73657f2ee115ae, type: 3}
+  timeSlowFactor: 0.1
+  bombFallSound: {fileID: 8300000, guid: c2f80d5a950966f42a61e331994f2a36, type: 3}
+  bombImpactSound: {fileID: 8300000, guid: 8d1a97f318f6c4b4caf1d2e5f0b5ee21, type: 3}
+  explosionRadius: 20
+  explosionForce: 500

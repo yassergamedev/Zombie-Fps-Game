@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Weapon
+  - PlayerUI
+  - TopCamera
+  - Zombie
+  - GameUI
   layers:
   - Default
   - TransparentFX

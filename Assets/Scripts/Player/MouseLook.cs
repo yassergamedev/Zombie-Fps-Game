@@ -2,16 +2,23 @@ using UnityEngine;
 
 public class MouseLook : MonoBehaviour
 {
-    public float mouseSensitivity = 100f;
     public Transform playerBody;
-
+    public float sensitivityMultiplier = 1000f; // Factor to multiply the sensitivity by
+    public float mouseSensitivity;
     private float xRotation = 0f;
 
     void Start()
     {
+        // Retrieve mouse sensitivity from PlayerPrefs, with a default value of 1f
+        mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 1f) * sensitivityMultiplier;
+        Debug.Log(mouseSensitivity);
+        // Lock the cursor to the center of the screen
         Cursor.lockState = CursorLockMode.Locked;
     }
-
+    public void SetMouseSensitivity(float sens)
+    {
+        mouseSensitivity = sens * sensitivityMultiplier;
+    }
     void Update()
     {
         // Mouse input

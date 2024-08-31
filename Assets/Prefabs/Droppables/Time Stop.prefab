@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2905178909850579559
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2126824138299787313, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611323200, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_Name
+      value: Time Stop
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 446.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 16.760788
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 456.98434
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111544916611549536, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5111544916611323200, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3998678940365966950}
+    - targetCorrespondingSourceObject: {fileID: 5111544916611323200, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2837746292225497943}
+  m_SourcePrefab: {fileID: 100100000, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+--- !u!1 &7979991333409122087 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5111544916611323200, guid: 030dbc91e8f48ef40bf620d9aeebc47e, type: 3}
+  m_PrefabInstance: {fileID: 2905178909850579559}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3998678940365966950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7979991333409122087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1519f38c5cf47c944866b288b341cb08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDropped:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2837746292225497943}
+        m_TargetAssemblyTypeName: TimeStop, Assembly-CSharp
+        m_MethodName: ActivateTimeStop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &2837746292225497943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7979991333409122087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6535e570e674600448b32b91c4b98e14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeStopDuration: 10
+  timeStopSound: {fileID: 8300000, guid: c6c411b6def051c47a9012fbcfbfd71b, type: 3}

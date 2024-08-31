@@ -1,23 +1,55 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AmmoBox : Interactable
 {
-    // Start is called before the first frame update
+    public int requiredPoints = 500; // Points required to open the ammo box
+   
+
+    public GameObject randomWeapon;
+    public bool isOpened = false; // Track if the box has been opened
+    private PlayerInteract playerInteract; // Reference to the player's interaction script
+    private Animator boxAnimator; // Reference to the box's animator
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        playerInteract = FindObjectOfType<PlayerInteract>(); // Find the PlayerInteract component in the scene
+        boxAnimator = GetComponentInParent<Animator>(); // Get the Animator component attached to the box
     }
 
     protected override void Interact()
     {
-        this.transform.GetComponentInParent<Animator>().SetTrigger("Open");
+        if (isOpened)
+        {
+            Debug.Log("The ammo box has already been opened.");
+            return;
+        }
+
+        if (playerInteract != null && playerInteract.points >= requiredPoints)
+        {
+            // Deduct points from the player
+            playerInteract.AddPoints(-requiredPoints);
+
+            // Play the opening animation
+            if (boxAnimator != null)
+            {
+                boxAnimator.SetTrigger("Open");
+            }
+
+            // Start the weapon shuffling 
+            randomWeapon.SetActive(true);
+
+            // Mark the box as opened
+            isOpened = true;
+        }
+        else
+        {
+            Debug.Log("Not enough points to open the ammo box.");
+        }
     }
+
+ 
+
 }

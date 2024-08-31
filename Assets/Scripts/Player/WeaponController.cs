@@ -7,13 +7,13 @@ public class WeaponController : MonoBehaviour
     public Camera playerCamera;
 
     public float shakeAmount = 0.1f;
-    public Vector3 rotationOffset;
 
     [Header("Focus Settings")]
     public Transform weaponHolder;
     public Vector3 focusPosition = new Vector3(0, -0.2f, 0.5f);
     public Vector3 focusRotation = new Vector3(10, 0, 0);
     public float focusSpeed = 5f;
+
     private Vector3 originalPosition;
     private Quaternion originalRotation;
 
@@ -29,14 +29,33 @@ public class WeaponController : MonoBehaviour
     private bool isReloading = false;
 
     private float nextTimeToFire = 0f;
+    public GameObject player;
+    private PlayerUI currentPlayerUI;
+    private PlayerMovement playerMovement;
+    public GameObject crossHair;
 
+    private Vector3 recoilPosition;
+    private Quaternion recoilRotation;
+    private Vector3 originalCameraPosition;
+    private Quaternion originalCameraRotation;
+    private bool isRecoiling = false;
     void Start()
     {
+        // Store the original position and rotation from the weaponHolder
         originalPosition = weaponHolder.localPosition;
         originalRotation = weaponHolder.localRotation;
+
+        // Store the original camera position and rotation
+        originalCameraPosition = playerCamera.transform.localPosition;
+        originalCameraRotation = playerCamera.transform.localRotation;
+
         playerCamera.fieldOfView = defaultFOV;
 
         SwitchWeapon(0);
+
+        currentPlayerUI = player.GetComponent<PlayerUI>();
+        playerMovement = player.GetComponent<PlayerMovement>();
+        currentPlayerUI.UpdateAmmoText(currentWeapon.maxAmmo, currentWeapon.maxAmmo);
     }
 
     void Update()
@@ -46,16 +65,28 @@ public class WeaponController : MonoBehaviour
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && currentAmmo > 0)
         {
             nextTimeToFire = Time.time + currentWeapon.fireRate;
-            currentWeapon.Shoot(playerCamera, rotationOffset, shakeAmount, this);
+            currentWeapon.Shoot(playerCamera, Vector3.zero, shakeAmount, this);
             currentAmmo--;
+
+            // Apply recoil when shooting
+            //ApplyRecoil(currentWeapon.recoilAmount);
+        }
+        else
+        {
+            if (currentAmmo <= 0)
+            {
+                StartCoroutine(Reload());
+            }
         }
 
-        if (Input.GetButton("Fire2"))
+        if (Input.GetButton("Fire2") )
         {
+            crossHair.SetActive(false);
             FocusWeapon(true);
         }
         else
         {
+            crossHair.SetActive(true);
             FocusWeapon(false);
         }
 
@@ -74,8 +105,8 @@ public class WeaponController : MonoBehaviour
     {
         if (isFocusing)
         {
-            weaponHolder.localPosition = Vector3.Lerp(weaponHolder.localPosition, focusPosition, Time.deltaTime * focusSpeed);
-            weaponHolder.localRotation = Quaternion.Lerp(weaponHolder.localRotation, Quaternion.Euler(focusRotation), Time.deltaTime * focusSpeed);
+            weaponHolder.localPosition = Vector3.Lerp(weaponHolder.localPosition, currentWeapon.focusPosition, Time.deltaTime * focusSpeed);
+            weaponHolder.localRotation = Quaternion.Lerp(weaponHolder.localRotation, Quaternion.Euler(currentWeapon.focusRotation), Time.deltaTime * focusSpeed);
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomedFOV, Time.deltaTime * zoomSpeed);
         }
         else
@@ -86,11 +117,12 @@ public class WeaponController : MonoBehaviour
         }
     }
 
-    void SwitchWeapon(int weaponIndex)
+    public void SwitchWeapon(int weaponIndex)
     {
         if (weapons.Count > 0)
         {
             weapons[currentWeaponIndex].SetActive(false);
+           
         }
 
         currentWeaponIndex = weaponIndex;
@@ -98,6 +130,7 @@ public class WeaponController : MonoBehaviour
 
         currentWeapon = weapons[currentWeaponIndex].GetComponent<Weapon>();
         currentAmmo = currentWeapon.maxAmmo;
+        player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
     }
 
     IEnumerator Reload()
@@ -111,13 +144,13 @@ public class WeaponController : MonoBehaviour
 
     public IEnumerator ShakeCamera(Camera playerCamera, float shakeAmount)
     {
-        Vector3 originalPosition = playerCamera.transform.localPosition;
+        Vector3 originalPosition = playerCamera.gameObject.transform.localPosition;
         for (int i = 0; i < 5; i++)
         {
-            playerCamera.transform.localPosition = originalPosition + Random.insideUnitSphere * shakeAmount;
+            playerCamera.gameObject.transform.localPosition = originalPosition + Random.insideUnitSphere * shakeAmount;
             yield return null;
         }
-        playerCamera.transform.localPosition = originalPosition;
+        playerCamera.gameObject.transform.localPosition = originalPosition;
     }
 
     public IEnumerator MuzzleFlash(GameObject muzzleFlashPrefab, Transform muzzlePoint, Light muzzleFlashLight)
@@ -128,4 +161,22 @@ public class WeaponController : MonoBehaviour
         yield return new WaitForSeconds(0.05f);
         muzzleFlashLight.enabled = false;
     }
+    public void ApplyRecoil(Vector3 recoilAmount)
+    {
+        // Calculate the target rotation for recoil
+        Quaternion recoilTargetRotation = originalCameraRotation * Quaternion.Euler(recoilAmount);
+
+        // Apply the recoil rotation instantly
+        playerCamera.gameObject.transform.localRotation = recoilTargetRotation;
+
+        //   recoil flag to true if needed for other logic
+        isRecoiling = true;
+
+
+    }
+    public void RecoilMath()
+    {
+
+    }
+
 }
