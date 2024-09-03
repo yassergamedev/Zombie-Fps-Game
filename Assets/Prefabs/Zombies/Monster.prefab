@@ -195,6 +195,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -22.540142
       objectReference: {fileID: 0}
+    - target: {fileID: 2137176147124068213, guid: 0213f9e9fa70456448503d54b393b4fe, type: 3}
+      propertyPath: m_TagString
+      value: Zombie
+      objectReference: {fileID: 0}
     - target: {fileID: 2224734551951520329, guid: 0213f9e9fa70456448503d54b393b4fe, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
@@ -892,8 +896,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.19790643
-  m_Center: {x: -0.19790643, y: 0, z: 0}
+  m_Radius: 0.14628762
+  m_Center: {x: -0.045777645, y: -0.00000003457671, z: 0.00000006928572}
 --- !u!54 &4195523332466956466
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1540,9 +1544,10 @@ MonoBehaviour:
   hitSound: {fileID: 6834368371421963205}
   runSound: {fileID: 7067554034215105401}
   dieSound: {fileID: 4785500933464988541}
+  isDead: 0
   headshotMultiplier: 2.5
   headCollider: {fileID: 566162486123357125}
-  activateRagDollOnDeath: 1
+  activateRagDollOnDeath: 0
 --- !u!82 &401005359591334515
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1555,7 +1560,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: dfe442cdcbb035445badfaef98abdd3f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.348
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1651,7 +1656,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: dfe442cdcbb035445badfaef98abdd3f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.367
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1747,7 +1752,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: d30426749301f134898513fc14b7181b, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.398
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1843,7 +1848,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f46cb8f210fe40d43ab013923f0ecd08, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.373
   m_Pitch: 1
   Loop: 0
   Mute: 0

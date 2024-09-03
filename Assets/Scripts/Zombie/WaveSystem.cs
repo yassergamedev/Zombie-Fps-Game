@@ -21,29 +21,33 @@ public class WaveSystem : MonoBehaviour
     private int currentWaveIndex = 0;
     private bool spawningWave = false;
     private AudioSource audioSource;
-    private int remainingZombies;
+    public int remainingZombies = 0;
     private int deathCounter = 0; // Counter to track the number of zombie deaths
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
         UpdateWaveNumberUI();
-        StartCoroutine(StartWaveAfterCooldown());
+       
     }
 
     void Update()
     {
         if (!spawningWave && remainingZombies <= 0)
         {
+            Debug.Log("starting wave");
             StartCoroutine(StartNextWave());
+            // Track the highest wave the player has reached
+            int highestWave = PlayerPrefs.GetInt("WaveMax", 0);
+            if (currentWaveIndex > highestWave)
+            {
+                PlayerPrefs.SetInt("WaveMax", currentWaveIndex);
+                PlayerPrefs.Save();
+            }
         }
     }
 
-    IEnumerator StartWaveAfterCooldown()
-    {
-        yield return new WaitForSeconds(startCooldown); // Wait before starting the first wave
-        StartNextWave();
-    }
+   
 
     IEnumerator StartNextWave()
     {
@@ -54,22 +58,16 @@ public class WaveSystem : MonoBehaviour
         {
             audioSource.PlayOneShot(waveStartSound);
         }
-
+        yield return new WaitForSeconds(timeBetweenWaves); // Wait before starting wave
         int zombieCount = Mathf.Min(Mathf.RoundToInt(initialZombieCount * Mathf.Pow(spawnRateMultiplier, currentWaveIndex)), maxZombiesPerWave);
         remainingZombies = zombieCount;
 
-        for (int i = 0; i < zombiePrefabs.Length; i++)
+        for (int i = 0; i < zombieCount; i++)
         {
-            if (currentWaveIndex >= rareZombieStartWave || i < zombiePrefabs.Length - 1)
-            {
-                int spawnCount = zombieCount / zombiePrefabs.Length;
-                for (int j = 0; j < spawnCount; j++)
-                {
                     Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-                    SpawnZombie(zombiePrefabs[i], spawnPoint.position, spawnPoint.rotation);
+                    SpawnZombie(zombiePrefabs[(int)Random.Range(0, 2)], spawnPoint.position, spawnPoint.rotation);
                     yield return new WaitForSeconds(spawnInterval);
-                }
-            }
+            
         }
 
         UpdateWaveNumberUI();
@@ -109,7 +107,7 @@ public class WaveSystem : MonoBehaviour
                 PlayerPrefs.Save();
             }
 
-            StartNextWave();
+            StartCoroutine(StartNextWave());
         }
     }
 

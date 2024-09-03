@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class WeaponController : MonoBehaviour
 {
@@ -9,9 +10,6 @@ public class WeaponController : MonoBehaviour
     public float shakeAmount = 0.1f;
 
     [Header("Focus Settings")]
-    public Transform weaponHolder;
-    public Vector3 focusPosition = new Vector3(0, -0.2f, 0.5f);
-    public Vector3 focusRotation = new Vector3(10, 0, 0);
     public float focusSpeed = 5f;
 
     private Vector3 originalPosition;
@@ -25,11 +23,13 @@ public class WeaponController : MonoBehaviour
     public List<GameObject> weapons;
     private int currentWeaponIndex = 0;
     public Weapon currentWeapon;
+    private Transform weaponTransform;
     private int currentAmmo;
     private bool isReloading = false;
 
     private float nextTimeToFire = 0f;
     public GameObject player;
+
     private PlayerUI currentPlayerUI;
     private PlayerMovement playerMovement;
     public GameObject crossHair;
@@ -38,12 +38,11 @@ public class WeaponController : MonoBehaviour
     private Quaternion recoilRotation;
     private Vector3 originalCameraPosition;
     private Quaternion originalCameraRotation;
-    private bool isRecoiling = false;
+    public bool isRecoiling = false;
+    public bool isFocusing = false;
     void Start()
     {
-        // Store the original position and rotation from the weaponHolder
-        originalPosition = weaponHolder.localPosition;
-        originalRotation = weaponHolder.localRotation;
+       
 
         // Store the original camera position and rotation
         originalCameraPosition = playerCamera.transform.localPosition;
@@ -56,6 +55,10 @@ public class WeaponController : MonoBehaviour
         currentPlayerUI = player.GetComponent<PlayerUI>();
         playerMovement = player.GetComponent<PlayerMovement>();
         currentPlayerUI.UpdateAmmoText(currentWeapon.maxAmmo, currentWeapon.maxAmmo);
+        weaponTransform = currentWeapon.gameObject.transform;
+        // Store the original position and rotation from the weaponHolder
+        originalPosition = weaponTransform.localPosition;
+        originalRotation = weaponTransform.localRotation;
     }
 
     void Update()
@@ -64,9 +67,12 @@ public class WeaponController : MonoBehaviour
 
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && currentAmmo > 0)
         {
-            nextTimeToFire = Time.time + currentWeapon.fireRate;
-            currentWeapon.Shoot(playerCamera, Vector3.zero, shakeAmount, this);
-            currentAmmo--;
+            if (!playerMovement.isSprinting) {
+                nextTimeToFire = Time.time + currentWeapon.fireRate;
+                currentWeapon.Shoot(playerCamera, Vector3.zero, shakeAmount, this);
+                currentAmmo--;
+            }
+           
 
             // Apply recoil when shooting
             //ApplyRecoil(currentWeapon.recoilAmount);
@@ -79,15 +85,30 @@ public class WeaponController : MonoBehaviour
             }
         }
 
-        if (Input.GetButton("Fire2") )
+        if (Input.GetButton("Fire2"))
         {
-            crossHair.SetActive(false);
-            FocusWeapon(true);
+            // Check if the current weapon is an RPG
+            if (!(currentWeapon is RPG))
+            {
+                crossHair.SetActive(false);
+                isFocusing = true;
+
+                if (!playerMovement.isSprinting)
+                {
+                    FocusWeapon(true);
+                    currentWeapon.weaponAnimator.Play("Idle");
+                    isFocusing = true;
+                }
+            }
+
+
         }
         else
         {
             crossHair.SetActive(true);
+           // currentWeapon.weaponAnimator.SetTrigger("Idle");
             FocusWeapon(false);
+            isFocusing = false;
         }
 
         if (Input.GetButtonDown("SwitchWeapon"))
@@ -99,23 +120,71 @@ public class WeaponController : MonoBehaviour
         {
             StartCoroutine(Reload());
         }
+        if (playerMovement.isSprinting)
+        {
+            WeaponSprintPosition();
+        }
+        else
+        {
+            WeaponSprintPosition();
+        }
     }
+    void WeaponSprintPosition()
+    {
+        if (playerMovement.isSprinting)
+        {
+            // Calculate target position and rotation when focusing
+            Vector3 targetPosition = currentWeapon.sprintPositionOffset;
+            Quaternion targetRotation = Quaternion.Euler(currentWeapon.sprintRotationOffset);
 
+            // Smoothly interpolate position and rotation
+            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, targetPosition, Time.deltaTime * focusSpeed);
+            weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, targetRotation, Time.deltaTime * focusSpeed);
+            crossHair.SetActive(false);
+
+        }
+        else
+        {
+            if (!isFocusing)
+            {
+                // Smoothly reset to the original position and rotation
+                weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, originalPosition, Time.deltaTime * focusSpeed);
+                weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, originalRotation, Time.deltaTime * focusSpeed);
+                crossHair.SetActive(true);
+            }
+           
+
+        }
+    }
     void FocusWeapon(bool isFocusing)
     {
         if (isFocusing)
         {
-            weaponHolder.localPosition = Vector3.Lerp(weaponHolder.localPosition, currentWeapon.focusPosition, Time.deltaTime * focusSpeed);
-            weaponHolder.localRotation = Quaternion.Lerp(weaponHolder.localRotation, Quaternion.Euler(currentWeapon.focusRotation), Time.deltaTime * focusSpeed);
+            // Calculate target position and rotation when focusing
+            Vector3 targetPosition = currentWeapon.positionOffset;
+            Quaternion targetRotation =  Quaternion.Euler(currentWeapon.rotationOffset);
+
+            // Smoothly interpolate position and rotation
+            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, targetPosition, Time.deltaTime * focusSpeed);
+            weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, targetRotation, Time.deltaTime * focusSpeed);
+
+            // Optionally, you can Slerp the camera's field of view for a zoom effect
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomedFOV, Time.deltaTime * zoomSpeed);
+            playerCamera.gameObject.GetComponent<Animator>().speed = 0;
         }
         else
         {
-            weaponHolder.localPosition = Vector3.Lerp(weaponHolder.localPosition, originalPosition, Time.deltaTime * focusSpeed);
-            weaponHolder.localRotation = Quaternion.Lerp(weaponHolder.localRotation, originalRotation, Time.deltaTime * focusSpeed);
+            // Smoothly reset to the original position and rotation
+           weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, originalPosition, Time.deltaTime * focusSpeed);
+            weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, originalRotation, Time.deltaTime * focusSpeed);
+
+            //Reset the camera's field of view
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, defaultFOV, Time.deltaTime * zoomSpeed);
+            playerCamera.enabled = true;
+            playerCamera.gameObject.GetComponent<Animator>().speed = 1;
         }
     }
+
 
     public void SwitchWeapon(int weaponIndex)
     {
@@ -131,6 +200,10 @@ public class WeaponController : MonoBehaviour
         currentWeapon = weapons[currentWeaponIndex].GetComponent<Weapon>();
         currentAmmo = currentWeapon.maxAmmo;
         player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
+        weaponTransform = currentWeapon.gameObject.transform;
+        // Store the original position and rotation from the weaponHolder
+        originalPosition = weaponTransform.localPosition;
+        originalRotation = weaponTransform.localRotation;
     }
 
     IEnumerator Reload()
@@ -174,9 +247,6 @@ public class WeaponController : MonoBehaviour
 
 
     }
-    public void RecoilMath()
-    {
-
-    }
+   
 
 }

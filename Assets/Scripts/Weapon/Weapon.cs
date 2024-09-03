@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -5,8 +6,8 @@ public class Weapon : MonoBehaviour
     public float range = 100f;
     public float damage = 10f;
     public float fireRate = 0.1f;
-    public int maxAmmo = 30;       // Maximum ammo in the magazine
-    public int ammoReserve = 90;   // Total ammo in reserve
+    public int maxAmmo = 30;
+    public int ammoReserve = 90;
     public float reloadTime = 2f;
     public int pointsOnHit = 15;
     public AudioClip shootSound;
@@ -16,129 +17,167 @@ public class Weapon : MonoBehaviour
     public Transform muzzlePoint;
     public Light muzzleFlashLight;
 
-    public GameObject bloodEffectPrefab; // Blood effect prefab for zombie hits
+    public GameObject bloodEffectPrefab;
 
-    public Animator weaponAnimator; // Optional: If each weapon has a unique animator
+    public Animator weaponAnimator;
 
     public AudioSource audioSource;
-    public int currentAmmo; // Current ammo count
-    public PlayerUI playerUI; // Reference to PlayerUI script
+    public int currentAmmo;
+    public PlayerUI playerUI;
 
-    public Vector3 focusPosition = new Vector3(0, -0.2f, 0.5f);
-    public Vector3 focusRotation = new Vector3(10, 0, 0);
+    [Header("Recoil")]
+    public float recoilX;
+    public float recoilY;
+    public MouseLook mouseLook;
+    public Vector3 RecoilPush ;
+    public Vector3 RecoilRotate;
 
-    public Vector3 recoilAmount = new Vector3(0.1f, 0.1f, 0.2f); // Recoil movement in each axis
-    public float recoilSpeed = 10f; // Speed of the recoil effect
-    public float recoilReturnSpeed = 20f; // Speed of the return to the original position after recoil
+    [Header ("Aim")]
+    public Vector3 rotationOffset;
+    public Vector3 positionOffset;
 
+    [Header("Sprint")]
+    public Vector3 sprintRotationOffset;
+    public Vector3 sprintPositionOffset;
+    public bool isSprintable;
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
         muzzleFlashLight.enabled = false;
 
-        currentAmmo = maxAmmo; // Initialize current ammo
-        playerUI = FindObjectOfType<PlayerUI>(); // Find the PlayerUI component in the scene
+        currentAmmo = maxAmmo;
+        playerUI = FindObjectOfType<PlayerUI>();
 
-        // Update the ammo text at the start
-        playerUI.UpdateAmmoText(currentAmmo, ammoReserve); // Show current ammo and reserve ammo
+     
+
+        playerUI.UpdateAmmoText(currentAmmo, ammoReserve);
+
+        mouseLook = FindObjectOfType<MouseLook>();
     }
 
     public virtual void Shoot(Camera playerCamera, Vector3 rotationOffset, float shakeAmount, WeaponController controller)
     {
         if (currentAmmo > 0)
         {
-            //controller.StartCoroutine(controller.ShakeCamera(playerCamera, shakeAmount));
-
-            // Play shooting sound
+            // Play shoot sound
             audioSource.PlayOneShot(shootSound);
+
+            // Play shooting animation if available
             if (weaponAnimator != null)
             {
                 weaponAnimator.Play("Shoot");
             }
 
-            // Muzzle flash effect
+            // Apply recoil effect to mouse look
+            mouseLook.AddRecoil(recoilX, recoilY);
+
+            // Start the muzzle flash effect
             controller.StartCoroutine(controller.MuzzleFlash(muzzleFlashPrefab, muzzlePoint, muzzleFlashLight));
 
-            // Raycast for shooting
+            // Recoil effect: Slightly rotate the weapon upwards and push it back
+            StartCoroutine(ApplyWeaponRecoil());
+
             RaycastHit hit;
             if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, range))
             {
                 Debug.Log(hit.transform.name);
 
-                // Find the top parent of the hit object
                 Transform hitTransform = hit.transform;
                 while (hitTransform.parent != null)
                 {
                     hitTransform = hitTransform.parent;
                 }
 
-                // Check if the top parent has the tag "Zombie"
                 if (hitTransform.CompareTag("Zombie"))
                 {
-                    // Get the Zombie component from the top parent
                     Zombie zombie = hitTransform.GetComponent<Zombie>();
                     if (zombie != null)
                     {
-                        float finalDamage = damage; // Default damage
+                        float finalDamage = damage;
 
-                        // Check if the hit was on the head
-                        if (hit.collider == zombie.headCollider) // Assume headCollider is a public Collider in the Zombie script
+                        if (hit.collider == zombie.headCollider)
                         {
-                            finalDamage *= zombie.headshotMultiplier; // Apply headshot multiplier
+                            finalDamage *= zombie.headshotMultiplier;
                         }
 
-                        // Apply damage to the zombie
                         zombie.TakeDamage(finalDamage);
 
-                        // Instantiate blood effect at the hit point
                         if (bloodEffectPrefab != null)
                         {
                             GameObject bloodEffect = Instantiate(bloodEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
-                            Destroy(bloodEffect, .5f); // Destroy blood effect after 0.5 seconds
+                            Destroy(bloodEffect, .5f);
                         }
 
-                        if (zombie.health <= 60)
+                        PlayerInteract playerInteract = playerCamera.GetComponentInParent<PlayerInteract>();
+                        if (playerInteract != null)
                         {
-                            // Add points to the player
-                            PlayerInteract playerInteract = playerCamera.GetComponentInParent<PlayerInteract>();
-                            if (playerInteract != null)
-                            {
+                            if (!zombie.isDead)
                                 playerInteract.AddPoints(pointsOnHit);
-                            }
                         }
                     }
                 }
-                else
+                else if (hit.collider != null && !hit.collider.isTrigger) // Ensure the raycast hit a collider that is not a trigger
                 {
-                    // Instantiate bullet hole on hit surface with adjusted rotation
                     Quaternion rotation = Quaternion.LookRotation(hit.normal);
                     rotation *= Quaternion.Euler(rotationOffset);
                     GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point, rotation);
 
-                    // Destroy bullet hole after 5 seconds
                     Destroy(bulletHole, 5f);
                 }
             }
 
-            currentAmmo--; // Decrease ammo count
-            playerUI.UpdateAmmoText(currentAmmo, ammoReserve); // Update the ammo text
+            currentAmmo--;
+            playerUI.UpdateAmmoText(currentAmmo, ammoReserve);
         }
     }
+    IEnumerator ApplyWeaponRecoil()
+    {
+        Vector3 originalPosition = transform.localPosition;
+        Quaternion originalRotation = transform.localRotation;
 
+        // Define the target position and rotation for recoil
+        Vector3 recoilPosition = originalPosition + RecoilPush; // Push weapon back slightly
+        Quaternion recoilRotation = originalRotation * Quaternion.Euler(RecoilRotate); // Slightly rotate weapon upwards
 
+        // Apply recoil
+        float elapsedTime = 0f;
+        float recoilDuration = 0.1f;
+        while (elapsedTime < recoilDuration)
+        {
+            transform.localPosition = Vector3.Lerp(originalPosition, recoilPosition, elapsedTime / recoilDuration);
+            transform.localRotation = Quaternion.Lerp(originalRotation, recoilRotation, elapsedTime / recoilDuration);
 
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Return to original position and rotation after recoil
+        elapsedTime = 0f;
+        while (elapsedTime < recoilDuration)
+        {
+            transform.localPosition = Vector3.Lerp(recoilPosition, originalPosition, elapsedTime / recoilDuration);
+            transform.localRotation = Quaternion.Lerp(recoilRotation, originalRotation, elapsedTime / recoilDuration);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure weapon returns to original position and rotation fully
+        transform.localPosition = originalPosition;
+        transform.localRotation = originalRotation;
+    }
 
 
     public void Reload()
     {
-        int ammoToReload = maxAmmo - currentAmmo; // Calculate how much ammo is needed to fill the magazine
+        int ammoToReload = maxAmmo - currentAmmo;
 
         if (ammoReserve > 0 && ammoToReload > 0)
         {
-            ammoToReload = Mathf.Min(ammoToReload, ammoReserve); // Determine how much ammo can be reloaded
+            ammoToReload = Mathf.Min(ammoToReload, ammoReserve);
 
-            currentAmmo += ammoToReload; // Add the reloaded ammo to the current ammo
-            ammoReserve -= ammoToReload; // Subtract the used ammo from the reserve
+            currentAmmo += ammoToReload;
+            ammoReserve -= ammoToReload;
 
             audioSource.PlayOneShot(reloadSound);
             if (weaponAnimator != null)
@@ -146,7 +185,6 @@ public class Weapon : MonoBehaviour
                 weaponAnimator.Play("Reload");
             }
 
-            // Update the ammo text after reloading
             playerUI.UpdateAmmoText(currentAmmo, ammoReserve);
         }
         else

@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
     void Start()
     {
         // Get the highest wave from PlayerPrefs
-        int highestWave = PlayerPrefs.GetInt("HighestWave", 0);
+        int highestWave = PlayerPrefs.GetInt("WaveMax", 0);
 
         // Update the UI Text component with the highest wave value
         highestWaveText.text =  highestWave.ToString();

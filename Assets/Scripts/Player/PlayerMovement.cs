@@ -47,6 +47,11 @@ public class PlayerMovement : MonoBehaviour
 
     public AudioSource runningSound;
     public AudioSource jumpSound;
+
+    public bool isSprinting = false;
+
+    public float raycastDistance = 0.5f; // Distance for raycasting to check for obstacles
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -78,42 +83,61 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        if (x != 0 || z != 0)
+        // Check for obstacles
+        if (!CanMoveInDirection(move))
+        {
+            move = Vector3.zero; // Stop movement if there's an obstacle
+        }
+
+        if ((x != 0 || z != 0) && !weaponController.isFocusing)
         {
             SpreadCrosshair(crosshairSpread / 2); // Spread the crosshair lines
-            weapon.GetComponent<Animator>().ResetTrigger("Idle");
-            weapon.GetComponent<Animator>().SetTrigger("Run");
-            //weapon.GetComponent<Animator>().Play("Run");
 
-            if (!runningSound.isPlaying) // Check if the running sound is not already playing
+            if (!weapon.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Run")
+                && weapon.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+            {
+                weapon.GetComponent<Animator>().Play("Run");
+            }
+
+            if (!runningSound.isPlaying)
             {
                 runningSound.Play();
             }
         }
         else
         {
-            weapon.GetComponent<Animator>().ResetTrigger("Run");
-            weapon.GetComponent<Animator>().SetTrigger("Idle");
-            
-            if (runningSound.isPlaying) // Check if the running sound is playing
+            if (weapon.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f && !weaponController.isFocusing)
+            {
+                weapon.GetComponent<Animator>().Play("Idle");
+            }
+
+            if (runningSound.isPlaying)
             {
                 runningSound.Stop();
             }
         }
 
         // Handle Sprinting
-        if (Input.GetButton("Sprint"))
+        if (Input.GetButton("Sprint") && weaponController.currentWeapon.isSprintable && !weaponController.isFocusing)
         {
-            
+            isSprinting = true;
+
             currentSpeed = Mathf.Lerp(currentSpeed, sprintSpeed, Time.deltaTime * 5f);  // Smoothly accelerate
-            //cameraAnimator.Play("Running"); // Trigger the running animation
+            if (!cameraAnimator.GetCurrentAnimatorStateInfo(0).IsName("Running"))
+                cameraAnimator.Play("Running"); // Trigger the running animation
             SpreadCrosshair(crosshairSpread); // Spread the crosshair lines
+            if (runningSound.pitch <= 1)
+                runningSound.pitch += 0.33f;
         }
         else
         {
-
+            if (runningSound.pitch > 0.66f)
+                runningSound.pitch -= 0.33f;
+            isSprinting = false;
             currentSpeed = Mathf.Lerp(currentSpeed, walkSpeed, Time.deltaTime * 5f);  // Smoothly decelerate to normal speed
-            
+
+            cameraAnimator.Play("Breathing");
+
             FocusCrosshair(); // Focus the crosshair lines back
         }
 
@@ -144,13 +168,27 @@ public class PlayerMovement : MonoBehaviour
             {
                 jumpSound.Play();
             }
-            
+
         }
 
         // Apply gravity
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
+
+    private bool CanMoveInDirection(Vector3 direction)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit, raycastDistance))
+        {
+            if (!hit.collider.isTrigger)
+            {
+                return false; // Obstacle is too close, and it's not a trigger, so cannot move
+            }
+        }
+        return true; // No obstacles or only triggers, can move
+    }
+
 
     private void SpreadCrosshair(float crosshairSpread)
     {

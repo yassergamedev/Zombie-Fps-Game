@@ -12,11 +12,8 @@ public class Zombie : MonoBehaviour
     public float damage = 10f;
     public float attackCooldown = 2f;
     private float lastAttackTime = 0f;
-    public float detectionRange = 10f;
     public float chaseSpeed = 3.5f;
     public float idleSpeed = 1.0f;
-    public float patrolRadius = 10f;
-    public int numberOfPatrolPoints = 3;
 
     public Transform playerTransform;
     private PlayerHealth playerHealth;
@@ -24,10 +21,6 @@ public class Zombie : MonoBehaviour
     private NavMeshAgent navMeshAgent;
 
     private bool hasPlayedHitAnimation = false;
-    public bool isAwareOfPlayer = false;
-    private Vector3[] patrolPoints;
-    private int currentPatrolIndex = 0;
-    private bool isPatrolling = false;
     private bool isRunning = false;
 
     // Ground Check
@@ -56,17 +49,18 @@ public class Zombie : MonoBehaviour
     public AudioSource dieSound;
 
     public event System.Action OnZombieKilled;
-    private bool isDead = false;
+    public bool isDead = false;
 
     public float headshotMultiplier = 2.5f; // Multiplier for headshot damage
     public Collider headCollider;
     public bool activateRagDollOnDeath;
+    public float raycastDistance = 0.5f; // Distance for raycasting to check for obstacles
+    private WaveSystem waveSystem;
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         mainCollider = GetComponent<Collider>();
-
-        // Initialize ragdoll
+        waveSystem = FindObjectOfType<WaveSystem>();
         InitializeRagdoll();
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -80,7 +74,21 @@ public class Zombie : MonoBehaviour
             Debug.LogError("Player not found. Make sure the player object is tagged 'Player'.");
         }
 
-        GeneratePatrolPoints();
+        // Disable NavMeshAgent auto-movement
+        navMeshAgent.updateRotation = false;
+    }
+
+    private bool CanMoveInDirection(Vector3 direction)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit, raycastDistance))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                return false; // player is too close, and it's not a trigger, so cannot move
+            }
+        }
+        return true; // No player or only triggers, can move
     }
 
     void Update()
@@ -96,50 +104,45 @@ public class Zombie : MonoBehaviour
                 direction.y = 0;
                 float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
-                if (distanceToPlayer <= detectionRange)
+                if (!isRunning)
                 {
-                    isAwareOfPlayer = true;
-                    isPatrolling = false;
+                    zombieAnimator.SetTrigger("Run");
+                    runSound.Play();
+                    isRunning = true;
+                    navMeshAgent.speed = chaseSpeed;
                 }
 
-                if (isAwareOfPlayer)
+                if (navMeshAgent.isOnNavMesh )
                 {
-                    if (!isRunning)
-                    {
-                        zombieAnimator.SetTrigger("Run");
-                        runSound.Play();
-                        isRunning = true;
-                        navMeshAgent.speed = chaseSpeed;
-                    }
-
-                    if (navMeshAgent.isOnNavMesh)
-                    {
-                        navMeshAgent.SetDestination(playerTransform.position);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Zombie is not on a NavMesh.");
-                    }
-
-                    AlignToGround();
-                    if (distanceToPlayer <= attackRange)
-                    {
-                        AttackPlayer();
-                    }
+                    navMeshAgent.SetDestination(playerTransform.position);
                 }
                 else
                 {
-                    if (!isPatrolling)
-                    {
-                        zombieAnimator.SetTrigger("Walk");
-                        idleSound.Play();
-                        navMeshAgent.speed = idleSpeed;
-                        StartCoroutine(Patrol());
-                    }
+                    Debug.LogWarning("Zombie is not on a NavMesh.");
+                }
+
+                AlignToGround();
+
+                // Manually sync the position and rotation of the NavMeshAgent with the Root Motion
+                if (navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance && CanMoveInDirection(direction))
+                {
+                    transform.position = navMeshAgent.nextPosition;
+                }
+
+                // Manually rotate the zombie to face the direction it's moving
+                if (direction != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
+                }
+
+                if (distanceToPlayer <= attackRange)
+                {
+                    AttackPlayer();
                 }
             }
         }
     }
+
 
     void AlignToGround()
     {
@@ -164,8 +167,7 @@ public class Zombie : MonoBehaviour
             {
                 if (navMeshAgent.isOnNavMesh)
                 {
-                    navMeshAgent.isStopped = false; // Ensure the zombie keeps moving
-                    navMeshAgent.speed = chaseSpeed / 2; // Slow down the zombie while attacking
+                    navMeshAgent.speed = 0;
                 }
 
                 string[] attackAnimations = { "Attack", "Punch", "Kick", "KickHard" };
@@ -206,8 +208,7 @@ public class Zombie : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        isAwareOfPlayer = true;
-        isPatrolling = false;
+
         health -= damage;
 
 
@@ -216,10 +217,14 @@ public class Zombie : MonoBehaviour
             if (zombieAnimator != null)
             {
                 zombieAnimator.Play("Hit");
-                isRunning = false;
+                navMeshAgent.speed = 0;
                 hitSound.Play();
             }
             hasPlayedHitAnimation = true;
+        }
+        else
+        {
+            navMeshAgent.speed = chaseSpeed;
         }
 
         if (health <= 0f)
@@ -230,20 +235,23 @@ public class Zombie : MonoBehaviour
 
     void Die()
     {
+        if(isDead) return; // In case shot again while dead, returns
+
+
         isDead = true; // Zombie is dead
 
+        waveSystem.remainingZombies -= 1;
         // Disable the main collider and activate ragdoll
         mainCollider.enabled = false;
         if (activateRagDollOnDeath)
             ActivateRagdoll();
         else
-            zombieAnimator.SetTrigger("Die");
+            zombieAnimator.Play("Die");
 
         // Drop an item with a chance
         TryDropItem();
-
-        // Invoke the OnZombieKilled event
-        OnZombieKilled?.Invoke();
+        navMeshAgent.speed = 0;
+        
 
         // Destroy the zombie after some time to allow the ragdoll to settle
         Destroy(gameObject, 10f);
@@ -278,67 +286,41 @@ public class Zombie : MonoBehaviour
         }
     }
 
-    void ActivateRagdoll()
+    public void ActivateRagdoll()
     {
+        // Disable animator
         zombieAnimator.enabled = false;
-        navMeshAgent.enabled = false;
 
-        foreach (Collider collider in ragdollColliders)
-        {
-            collider.enabled = true;
-        }
-
+        // Enable ragdoll rigidbodies and colliders
         foreach (Rigidbody rb in ragdollRigidbodies)
         {
-            rb.isKinematic = false;
+            rb.isKinematic = false; // Allow physics to take over
+            rb.detectCollisions = true;
         }
-    }
 
-    public void ReactToSound(Vector3 soundLocation)
-    {
-        if (!isAwareOfPlayer)
+        foreach (Collider col in ragdollColliders)
         {
-            isAwareOfPlayer = true;
-            navMeshAgent.SetDestination(soundLocation);
-            navMeshAgent.speed = chaseSpeed;
+            col.enabled = true;
         }
+
+        
+        ragdollRigidbodies[0].AddForce(transform.forward , ForceMode.Impulse);
     }
 
-    void GeneratePatrolPoints()
-    {
-        patrolPoints = new Vector3[numberOfPatrolPoints];
-        for (int i = 0; i < numberOfPatrolPoints; i++)
-        {
-            Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-            randomDirection += transform.position;
-            randomDirection.y = transform.position.y; // Keep patrol points at the same height
-            patrolPoints[i] = randomDirection;
-        }
-    }
 
-    IEnumerator Patrol()
-    {
-        isPatrolling = true;
-        int patrolIndex = 0;
-        while (true)
-        {
-            if (patrolPoints.Length == 0) yield break;
 
-            navMeshAgent.SetDestination(patrolPoints[patrolIndex]);
-
-            while (Vector3.Distance(transform.position, patrolPoints[patrolIndex]) > 1f)
-            {
-                yield return null;
-            }
-
-            patrolIndex = (patrolIndex + 1) % patrolPoints.Length;
-            yield return new WaitForSeconds(2f);
-        }
-    }
 
     public void Freeze()
     {
         isFrozen = true;
+
+        // Pause the animator by setting its speed to 0
+        if (zombieAnimator != null)
+        {
+            zombieAnimator.speed = 0f;
+        }
+
+        // Store the original speed and stop the NavMeshAgent
         originalSpeed = navMeshAgent.speed;
         navMeshAgent.speed = 0f;
     }
@@ -346,6 +328,15 @@ public class Zombie : MonoBehaviour
     public void Unfreeze()
     {
         isFrozen = false;
+
+        // Unpause the animator by restoring its speed to 1
+        if (zombieAnimator != null)
+        {
+            zombieAnimator.speed = 1f;
+        }
+
+        // Restore the NavMeshAgent's speed
         navMeshAgent.speed = originalSpeed;
     }
+
 }
