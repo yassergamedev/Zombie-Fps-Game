@@ -277,7 +277,7 @@ public class Zombie : MonoBehaviour
         
 
         // Destroy the zombie after some time to allow the ragdoll to settle
-        Destroy(gameObject, 2f);
+        Destroy(gameObject, 4f);
     }
 
 
@@ -286,7 +286,7 @@ public class Zombie : MonoBehaviour
         if (droppablePrefabs.Length > 0 && Random.value <= dropChance)
         {
             int randomIndex = Random.Range(0, droppablePrefabs.Length);
-            Instantiate(droppablePrefabs[randomIndex], transform.position, Quaternion.identity);
+            Instantiate(droppablePrefabs[randomIndex], transform.position + new Vector3(0,1,0), Quaternion.identity);
         }
     }
 

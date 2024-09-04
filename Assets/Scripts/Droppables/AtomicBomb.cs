@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AtomicBomb : MonoBehaviour
 {
@@ -12,20 +13,27 @@ public class AtomicBomb : MonoBehaviour
     [SerializeField] public Camera topCamera;
     [SerializeField] public GameObject GameUI;
     [SerializeField] private float cameraSwitchDelay = 1.0f;
+    [SerializeField] private Image whiteOverlay; // Reference to the white overlay UI
 
     private AudioSource audioSource;
 
     void Start()
     {
+        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().health = 9999;
         // Ensure the bomb has a Rigidbody component to fall due to gravity
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.useGravity = true;
-
-    
+        whiteOverlay = GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>();
         // Get the audio source from the bomb itself
         audioSource = GetComponent<AudioSource>();
         GameUI = GameObject.FindGameObjectWithTag("GameUI");
         GameUI.SetActive(false);
+
+        // Initially, set the white overlay to be transparent
+        if (whiteOverlay != null)
+        {
+            whiteOverlay.color = new Color(1, 1, 1, 0); // Fully transparent
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -54,6 +62,9 @@ public class AtomicBomb : MonoBehaviour
         // Start the camera shake coroutine
         StartCoroutine(CameraShake(0.5f, 0.5f)); // Adjust duration and magnitude as needed
 
+        // Flash the screen white
+        StartCoroutine(FlashWhiteScreen(0.5f, 1.5f)); // Adjust flash duration and fade duration as needed
+
         // Find all zombies within the explosion radius
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (Collider nearbyObject in colliders)
@@ -74,9 +85,9 @@ public class AtomicBomb : MonoBehaviour
             }
         }
 
-      
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = 0.02f;
+
         // Wait for the camera switch delay to allow the explosion to be captured
         yield return new WaitForSeconds(cameraSwitchDelay);
 
@@ -85,6 +96,7 @@ public class AtomicBomb : MonoBehaviour
         topCamera.gameObject.SetActive(true);
         mainCamera.gameObject.SetActive(true);
         GameUI.SetActive(true);
+
         // Destroy the bomb after explosion (delay destruction to allow camera capture)
         Destroy(gameObject, cameraSwitchDelay);
     }
@@ -110,15 +122,27 @@ public class AtomicBomb : MonoBehaviour
         bombCamera.gameObject.transform.localPosition = originalPosition;
     }
 
-    private IEnumerator SwitchBackToMainCamera()
+    private IEnumerator FlashWhiteScreen(float flashDuration, float fadeDuration)
     {
-        Time.timeScale = 1.0f;
-        Time.fixedDeltaTime = 0.02f;
-        // Wait for the camera switch delay to allow the explosion to be captured
-        yield return new WaitForSeconds(cameraSwitchDelay);
+        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().health = 100;
+        // Ensure whiteOverlay is not null
+        if (whiteOverlay == null) yield break;
 
-        // Switch back to the main camera
-        bombCamera.gameObject.SetActive(false);
-        mainCamera.gameObject.SetActive(true);
+        // Flash the screen white
+        whiteOverlay.color = new Color(1, 1, 1, 1); // Fully white
+        yield return new WaitForSeconds(flashDuration);
+
+        // Gradually fade out the white screen
+        float elapsedTime = 0.0f;
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(1, 0, elapsedTime / fadeDuration);
+            whiteOverlay.color = new Color(1, 1, 1, alpha);
+            yield return null;
+        }
+
+        // Ensure it's fully transparent at the end
+        whiteOverlay.color = new Color(1, 1, 1, 0);
     }
 }

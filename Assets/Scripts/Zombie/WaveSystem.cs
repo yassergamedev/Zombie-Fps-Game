@@ -123,6 +123,9 @@ public class WaveSystem : MonoBehaviour
     // Method to change spawn points based on player location
     public void UpdateSpawnPoints(Transform[] newSpawnPoints)
     {
-        spawnPoints = newSpawnPoints;
+        if (newSpawnPoints.Length > 0) {
+            spawnPoints = newSpawnPoints;
+        }
+        
     }
 }

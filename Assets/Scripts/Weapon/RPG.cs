@@ -26,7 +26,7 @@ public class RPG : Weapon
             controller.StartCoroutine(controller.MuzzleFlash(muzzleFlashPrefab, muzzlePoint, muzzleFlashLight));
 
             // Instantiate the rocket at the muzzle point
-            GameObject rocket = Instantiate(rocketPrefab, muzzlePoint.position, muzzlePoint.rotation);
+            GameObject rocket = Instantiate(rocketPrefab, muzzlePoint.position + new Vector3(0,-0.8f,0), muzzlePoint.rotation);
 
             // Set the rocket's velocity in the forward direction of the player camera
             Rigidbody rocketRb = rocket.GetComponent<Rigidbody>();

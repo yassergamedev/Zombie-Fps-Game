@@ -96,6 +96,7 @@ public class Door : Interactable
         // Play the repair animation
         if (doorAnimator != null)
         {
+            doorAnimator.ResetTrigger("Down");
             doorAnimator.SetTrigger("Repair");
         }
 

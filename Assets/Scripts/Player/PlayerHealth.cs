@@ -53,6 +53,7 @@ public class PlayerHealth : MonoBehaviour
         if (overlay.color.a > 0)
         {
             if (health < 30)
+
                 return;
             durationTimer += Time.deltaTime;
             if (durationTimer > duration)
@@ -111,7 +112,7 @@ public class PlayerHealth : MonoBehaviour
         lerpTimer = 0f;
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0.5f);
         durationTimer = 0f;
-        hitSound.Play();
+        
 
         // Stop any ongoing health regeneration
         if (healthRegenCoroutine != null)
@@ -125,6 +126,10 @@ public class PlayerHealth : MonoBehaviour
         if (health <= 0 && !isDead)
         {
             Die();
+        }
+        if(health <30 && !hitSound.isPlaying)
+        {
+            hitSound.Play();
         }
     }
 

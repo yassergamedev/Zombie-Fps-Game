@@ -11,6 +11,7 @@ TagManager:
   - Zombie
   - GameUI
   - Door
+  - White Overlay
   layers:
   - Default
   - TransparentFX

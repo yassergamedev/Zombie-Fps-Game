@@ -1297,7 +1297,7 @@ MonoBehaviour:
   health: 100
   bloodEffectPrefab: {fileID: 1013274939826982, guid: ffbf169ab9dcfdc45ae14010bc82a6b2, type: 3}
   zombieAnimator: {fileID: 3835330077327369505}
-  attackRange: 5
+  attackRange: 2
   damage: 10
   attackCooldown: 1
   chaseSpeed: 1.5

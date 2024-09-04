@@ -15,4 +15,15 @@ public class SpawnAreaTrigger : MonoBehaviour
             }
         }
     }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            WaveSystem waveSystem = FindObjectOfType<WaveSystem>();
+            if (waveSystem != null)
+            {
+                waveSystem.UpdateSpawnPoints(areaSpawnPoints);
+            }
+        }
+    }
 }
