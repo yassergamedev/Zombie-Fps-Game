@@ -46,6 +46,7 @@ public class Zombie : MonoBehaviour
     public AudioSource idleSound;
     public AudioSource hitSound;
     public AudioSource runSound;
+    public AudioSource attackSound;
     public AudioSource dieSound;
 
     public event System.Action OnZombieKilled;
@@ -104,44 +105,86 @@ public class Zombie : MonoBehaviour
                 direction.y = 0;
                 float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
-                if (!isRunning)
+                if (distanceToPlayer <= attackRange)
                 {
-                    zombieAnimator.SetTrigger("Run");
-                    runSound.Play();
-                    isRunning = true;
-                    navMeshAgent.speed = chaseSpeed;
-                }
-
-                if (navMeshAgent.isOnNavMesh )
-                {
-                    navMeshAgent.SetDestination(playerTransform.position);
+                    // Stop the zombie when it's within attack range
+                    StopZombie();
+                    AttackPlayer();
                 }
                 else
                 {
-                    Debug.LogWarning("Zombie is not on a NavMesh.");
-                }
-
-                AlignToGround();
-
-                // Manually sync the position and rotation of the NavMeshAgent with the Root Motion
-                if (navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance && CanMoveInDirection(direction))
-                {
-                    transform.position = navMeshAgent.nextPosition;
-                }
-
-                // Manually rotate the zombie to face the direction it's moving
-                if (direction != Vector3.zero)
-                {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
-                }
-
-                if (distanceToPlayer <= attackRange)
-                {
-                    AttackPlayer();
+                    // If the zombie is out of attack range, chase the player
+                    ChasePlayer(direction);
                 }
             }
         }
     }
+
+    void ChasePlayer(Vector3 direction)
+    {
+        if (!isRunning)
+        {
+            zombieAnimator.SetTrigger("Run");
+            runSound.Play();
+            isRunning = true;
+            navMeshAgent.speed = chaseSpeed;
+        }
+
+        if (navMeshAgent.isOnNavMesh)
+        {
+            navMeshAgent.SetDestination(playerTransform.position);
+        }
+        else
+        {
+            Debug.LogWarning("Zombie is not on a NavMesh.");
+        }
+
+        AlignToGround();
+
+        // Manually sync the position and rotation of the NavMeshAgent with the Root Motion
+        if (navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance && CanMoveInDirection(direction))
+        {
+            transform.position = navMeshAgent.nextPosition;
+        }
+
+        // Manually rotate the zombie to face the direction it's moving
+        if (direction != Vector3.zero)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
+        }
+    }
+
+    void StopZombie()
+    {
+        if (isRunning)
+        {
+            if (navMeshAgent.isOnNavMesh)
+            {
+                navMeshAgent.isStopped = true; // Stops the NavMeshAgent from moving
+            }
+            isRunning = false;
+        }
+    }
+
+    void AttackPlayer()
+    {
+        if (isDead) return; // Prevent attack if zombie is dead
+
+        if (Time.time >= lastAttackTime + attackCooldown)
+        {
+            if (zombieAnimator != null)
+            {
+             
+                
+                zombieAnimator.Play("Kick");
+
+                StartCoroutine(DealDamageAfterAnimation("Kick"));
+
+                lastAttackTime = Time.time;
+            }
+        }
+    }
+
 
 
     void AlignToGround()
@@ -157,29 +200,7 @@ public class Zombie : MonoBehaviour
         }
     }
 
-    void AttackPlayer()
-    {
-        if (isDead) return; // Prevent attack if zombie is dead
-
-        if (Time.time >= lastAttackTime + attackCooldown)
-        {
-            if (zombieAnimator != null)
-            {
-                if (navMeshAgent.isOnNavMesh)
-                {
-                    navMeshAgent.speed = 0;
-                }
-
-                string[] attackAnimations = { "Attack", "Punch", "Kick", "KickHard" };
-                string selectedAttack = attackAnimations[Random.Range(0, attackAnimations.Length)];
-                zombieAnimator.Play(selectedAttack);
-
-                StartCoroutine(DealDamageAfterAnimation(selectedAttack));
-
-                lastAttackTime = Time.time;
-            }
-        }
-    }
+   
 
 
 
@@ -194,6 +215,7 @@ public class Zombie : MonoBehaviour
             if (playerHealth != null && Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
             {
                 playerHealth.TakeDamage(damage);
+                attackSound.Play();
             }
 
             if (navMeshAgent.isOnNavMesh)
@@ -230,6 +252,7 @@ public class Zombie : MonoBehaviour
         if (health <= 0f)
         {
             Die();
+            zombieAnimator.speed = 1f;
         }
     }
 
@@ -254,7 +277,7 @@ public class Zombie : MonoBehaviour
         
 
         // Destroy the zombie after some time to allow the ragdoll to settle
-        Destroy(gameObject, 10f);
+        Destroy(gameObject, 2f);
     }
 
 
@@ -274,7 +297,7 @@ public class Zombie : MonoBehaviour
 
         foreach (Collider collider in ragdollColliders)
         {
-            if (collider != mainCollider)
+            if (collider != mainCollider && collider.name != "head")
             {
                 collider.enabled = false;
             }
@@ -337,6 +360,47 @@ public class Zombie : MonoBehaviour
 
         // Restore the NavMeshAgent's speed
         navMeshAgent.speed = originalSpeed;
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Door"))
+        {
+            StopZombie(); // Stop the zombie when it first hits the door
+        }
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Door"))
+        {
+            AnimatorStateInfo stateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+
+            // Check if the current animation has completed
+            if (stateInfo.normalizedTime >= 1.0f)
+            {
+                zombieAnimator.Play("Kick"); // Play the "Kick" animation
+                StartCoroutine(other.GetComponent<DoorHealth>().DamageDoor());
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Door"))
+        {
+            ResumeChasingPlayer(); // Continue chasing the player once the zombie exits the trigger
+        }
+    }
+
+    void ResumeChasingPlayer()
+    {
+        if (navMeshAgent.isOnNavMesh)
+        {
+            navMeshAgent.isStopped = false; // Resume NavMeshAgent movement
+            navMeshAgent.SetDestination(playerTransform.position); // Reassign player as the target destination
+            zombieAnimator.SetTrigger("Run"); // Switch back to the "Run" animation
+            isRunning = true;
+        }
     }
 
 }

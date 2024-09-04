@@ -566,6 +566,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7317118214247041293, guid: 16f88bac483bd004aa718dd62225897d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5430819123062541120}
+    - targetCorrespondingSourceObject: {fileID: 7317118214247041293, guid: 16f88bac483bd004aa718dd62225897d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5008875825286472157}
     - targetCorrespondingSourceObject: {fileID: 7317118214247041249, guid: 16f88bac483bd004aa718dd62225897d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 575290334080189797}
@@ -1296,7 +1299,7 @@ MonoBehaviour:
   zombieAnimator: {fileID: 3835330077327369505}
   attackRange: 5
   damage: 10
-  attackCooldown: 2
+  attackCooldown: 1
   chaseSpeed: 1.5
   idleSpeed: 1
   playerTransform: {fileID: 0}
@@ -1316,11 +1319,13 @@ MonoBehaviour:
   idleSound: {fileID: 757795054677566184}
   hitSound: {fileID: 2443552872025664944}
   runSound: {fileID: 6125573289898937817}
+  attackSound: {fileID: 5008875825286472157}
   dieSound: {fileID: 4539113153091966239}
   isDead: 0
   headshotMultiplier: 2.5
   headCollider: {fileID: 5114171722195118300}
   activateRagDollOnDeath: 0
+  raycastDistance: 0.5
 --- !u!82 &757795054677566184
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1727,6 +1732,102 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!82 &5008875825286472157
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3835330077334787927}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: ddd538aa406c01f4388637e4d0955bf1, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3835330077334787931 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7317118214247041281, guid: 16f88bac483bd004aa718dd62225897d, type: 3}

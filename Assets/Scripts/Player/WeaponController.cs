@@ -229,7 +229,7 @@ public class WeaponController : MonoBehaviour
     public IEnumerator MuzzleFlash(GameObject muzzleFlashPrefab, Transform muzzlePoint, Light muzzleFlashLight)
     {
         muzzleFlashLight.enabled = true;
-        GameObject muzzleFlash = Instantiate(muzzleFlashPrefab, muzzlePoint.position, muzzlePoint.rotation);
+        GameObject muzzleFlash = Instantiate(muzzleFlashPrefab, muzzlePoint.position + new Vector3(0,-0.8f,0), muzzlePoint.rotation);
         Destroy(muzzleFlash, 0.05f);
         yield return new WaitForSeconds(0.05f);
         muzzleFlashLight.enabled = false;

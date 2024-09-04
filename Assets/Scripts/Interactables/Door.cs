@@ -9,6 +9,7 @@ public class Door : Interactable
     public float holdTime = 3f; // Time the player needs to hold "E" to fix the door
 
     private bool isFixing = false; // Track if the player is in the process of fixing the door
+    public bool isFixed = true; // Track if the door is fixed
     private float currentHoldTime = 0f; // Track the current hold time
 
     [SerializeField]
@@ -16,7 +17,7 @@ public class Door : Interactable
 
     private PlayerInteract playerInteract; // Reference to the player's interaction script
     private Animator doorAnimator; // Reference to the door's animator
-
+   
     void Start()
     {
         // Ensure the loading slider is invisible at the start
@@ -57,6 +58,14 @@ public class Door : Interactable
                 // Reset the fixing process if the player releases "E"
                 ResetFixing();
             }
+        }
+        if (isFixed) {
+            promptMessage = "";
+
+        }
+        else
+        {
+            promptMessage = "(E) Repair";
         }
     }
 
@@ -103,6 +112,8 @@ public class Door : Interactable
         }
 
         Debug.Log("Door repair started!");
+        isFixed = true;
+        GetComponent<Collider>().isTrigger = true;
     }
 
     private void ResetFixing()
@@ -110,7 +121,7 @@ public class Door : Interactable
         // Reset the fixing process
         isFixing = false;
         currentHoldTime = 0f;
-
+        
         // Hide the loading slider
         if (loadingSlider != null)
         {

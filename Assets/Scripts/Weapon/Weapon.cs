@@ -90,24 +90,35 @@ public class Weapon : MonoBehaviour
 
                 if (hitTransform.CompareTag("Zombie"))
                 {
+                    Debug.Log("Hit Zombie");
                     Zombie zombie = hitTransform.GetComponent<Zombie>();
                     if (zombie != null)
                     {
                         float finalDamage = damage;
+                        Debug.Log("Hit place" + hit.collider.name);
 
-                        if (hit.collider == zombie.headCollider)
-                        {
-                            finalDamage *= zombie.headshotMultiplier;
-                        }
-
-                        zombie.TakeDamage(finalDamage);
-
+                        // Instantiate the blood effect regardless of headshot
                         if (bloodEffectPrefab != null)
                         {
-                            GameObject bloodEffect = Instantiate(bloodEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
-                            Destroy(bloodEffect, .5f);
+                            Transform parentTransform = hit.collider.transform.parent;
+                            GameObject bloodEffect = Instantiate(bloodEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal), parentTransform);
+                            Destroy(bloodEffect, 0.5f);
                         }
 
+                        // Check if the hit collider is the zombie's head collider
+                        if (hit.collider == zombie.headCollider)
+                        {
+                            Debug.Log("Headshot!");
+                            finalDamage *= zombie.headshotMultiplier;
+
+                            // Deactivate the head's collider and mesh renderer
+                            hit.collider.gameObject.SetActive(false);
+                        }
+
+                        // Apply damage to the zombie
+                        zombie.TakeDamage(finalDamage);
+
+                        // Add points if the zombie is not dead
                         PlayerInteract playerInteract = playerCamera.GetComponentInParent<PlayerInteract>();
                         if (playerInteract != null)
                         {
@@ -130,6 +141,7 @@ public class Weapon : MonoBehaviour
             playerUI.UpdateAmmoText(currentAmmo, ammoReserve);
         }
     }
+
     IEnumerator ApplyWeaponRecoil()
     {
         Vector3 originalPosition = transform.localPosition;

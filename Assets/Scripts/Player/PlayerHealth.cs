@@ -24,9 +24,14 @@ public class PlayerHealth : MonoBehaviour
     [Header("Death Settings")]
     public Animator playerAnimator;  // Animator for the player's death animation
     public AudioSource deathSound;   // Audio source for the death sound
+    public AudioSource hitSound;     // Audio source for the hit sound
     public Animator fadeInAnimator;  // Animator for fade-in effect
     public GameObject deathScreen;   // UI for the death screen
     public GameObject[] objectsToDeactivate; // Objects to deactivate on death
+
+    [Header("Heartbeat Settings")]
+    public AudioSource heartbeatSound;  // Audio source for the heartbeat sound
+    public float heartbeatThreshold = 0.3f; // Health percentage threshold to trigger the heartbeat
 
     private bool isDead = false;
     private Coroutine healthRegenCoroutine; // Store the coroutine for health regeneration
@@ -56,6 +61,22 @@ public class PlayerHealth : MonoBehaviour
                 float tempAlpha = overlay.color.a;
                 tempAlpha -= Time.deltaTime * fadeSpeed;
                 overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, tempAlpha);
+            }
+        }
+
+        // Play heartbeat sound when health is under 30%
+        if (health / maxHealth <= heartbeatThreshold)
+        {
+            if (!heartbeatSound.isPlaying)
+            {
+                heartbeatSound.Play();
+            }
+        }
+        else
+        {
+            if (heartbeatSound.isPlaying)
+            {
+                heartbeatSound.Stop();
             }
         }
     }
@@ -90,6 +111,7 @@ public class PlayerHealth : MonoBehaviour
         lerpTimer = 0f;
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0.5f);
         durationTimer = 0f;
+        hitSound.Play();
 
         // Stop any ongoing health regeneration
         if (healthRegenCoroutine != null)
@@ -97,7 +119,7 @@ public class PlayerHealth : MonoBehaviour
             StopCoroutine(healthRegenCoroutine);
         }
 
-        // Start the health regeneration coroutine after 1 second
+        // Start the health regeneration coroutine after 4 seconds
         healthRegenCoroutine = StartCoroutine(HealthRegenDelay());
 
         if (health <= 0 && !isDead)
@@ -108,8 +130,8 @@ public class PlayerHealth : MonoBehaviour
 
     IEnumerator HealthRegenDelay()
     {
-        // Wait for 1 second before starting health regeneration
-        yield return new WaitForSeconds(1f);
+        // Wait for 4 seconds before starting health regeneration
+        yield return new WaitForSeconds(4f);
 
         // Continue regenerating health while the player is not dead and health is not full
         while (!isDead && health < maxHealth)

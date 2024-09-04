@@ -51,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isSprinting = false;
 
     public float raycastDistance = 0.5f; // Distance for raycasting to check for obstacles
+    public AudioSource breathingSound;
 
     void Start()
     {
@@ -118,28 +119,41 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Handle Sprinting
-        if (Input.GetButton("Sprint") && weaponController.currentWeapon.isSprintable && !weaponController.isFocusing)
-        {
-            isSprinting = true;
+if (Input.GetButton("Sprint") && weaponController.currentWeapon.isSprintable && !weaponController.isFocusing)
+{
+    isSprinting = true;
 
-            currentSpeed = Mathf.Lerp(currentSpeed, sprintSpeed, Time.deltaTime * 5f);  // Smoothly accelerate
-            if (!cameraAnimator.GetCurrentAnimatorStateInfo(0).IsName("Running"))
-                cameraAnimator.Play("Running"); // Trigger the running animation
-            SpreadCrosshair(crosshairSpread); // Spread the crosshair lines
-            if (runningSound.pitch <= 1)
-                runningSound.pitch += 0.33f;
-        }
-        else
-        {
-            if (runningSound.pitch > 0.66f)
-                runningSound.pitch -= 0.33f;
-            isSprinting = false;
-            currentSpeed = Mathf.Lerp(currentSpeed, walkSpeed, Time.deltaTime * 5f);  // Smoothly decelerate to normal speed
+    currentSpeed = Mathf.Lerp(currentSpeed, sprintSpeed, Time.deltaTime * 5f);  // Smoothly accelerate
+    if (!cameraAnimator.GetCurrentAnimatorStateInfo(0).IsName("Running"))
+        cameraAnimator.Play("Running"); // Trigger the running animation
+    SpreadCrosshair(crosshairSpread); // Spread the crosshair lines
+    
+    if (runningSound.pitch <= 1)
+        runningSound.pitch += 0.33f;
 
-            cameraAnimator.Play("Breathing");
+    // Play breathing sound
+    if (!breathingSound.isPlaying)
+    {
+        breathingSound.Play();
+    }
+}
+else
+{
+    if (runningSound.pitch > 0.66f)
+        runningSound.pitch -= 0.33f;
+    isSprinting = false;
+    currentSpeed = Mathf.Lerp(currentSpeed, walkSpeed, Time.deltaTime * 5f);  // Smoothly decelerate to normal speed
 
-            FocusCrosshair(); // Focus the crosshair lines back
-        }
+    cameraAnimator.Play("Breathing");
+
+    FocusCrosshair(); // Focus the crosshair lines back
+
+    // Stop breathing sound when not sprinting
+    if (breathingSound.isPlaying)
+    {
+        breathingSound.Stop();
+    }
+}
 
         // Crouch handling
         if (Input.GetButton("Crouch"))

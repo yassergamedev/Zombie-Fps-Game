@@ -7,29 +7,23 @@ public class DoorHealth : MonoBehaviour
     private Animator doorAnimator; // Animator for the door
     private bool isDamaged = false; // Flag to check if the door is currently being damaged
     private float damageTimer = 0f; // Timer to keep track of duration
-
+    private Door door;
+    private AudioSource bangDoor;
     private void Start()
     {
         doorAnimator = GetComponent<Animator>();   
+        door= GetComponent<Door>();
+        bangDoor = GetComponent<AudioSource>();
         }
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Door Colliding with " + collision.collider.tag);
-        // Check if the colliding object has the tag "Zombie"
-        if (collision.collider.CompareTag("Zombie"))
-        {
-            if (!isDamaged)
-            {
-                // Start the damage sequence
-                isDamaged = true;
-                damageTimer = damageDuration;
-                StartCoroutine(DamageDoor());
-            }
-        }
-    }
+   
 
-    private IEnumerator DamageDoor()
+    public IEnumerator DamageDoor()
     {
+        if (!bangDoor.isPlaying)
+        {
+            bangDoor.Play();
+        }
+        
         // Wait for the specified duration
         yield return new WaitForSeconds(damageDuration);
 
@@ -41,5 +35,7 @@ public class DoorHealth : MonoBehaviour
 
         // Optionally, reset the damage state if needed
         isDamaged = false;
+        door.isFixed = false;
+        GetComponent<Collider>().isTrigger = false;
     }
 }
