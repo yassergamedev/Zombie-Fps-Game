@@ -33,6 +33,16 @@ public class Door : Interactable
 
     void Update()
     {
+        if (isFixed)
+        {
+            promptMessage = "";
+            return;
+        }
+        else
+        {
+            promptMessage = "(E) Repair";
+        }
+
         // Check if the player is holding "E" and is within range
         if (isFixing)
         {
@@ -59,14 +69,7 @@ public class Door : Interactable
                 ResetFixing();
             }
         }
-        if (isFixed) {
-            promptMessage = "";
-
-        }
-        else
-        {
-            promptMessage = "(E) Repair";
-        }
+       
     }
 
     protected override void Interact()
@@ -115,6 +118,7 @@ public class Door : Interactable
         Debug.Log("Door repair started!");
         isFixed = true;
         GetComponent<Collider>().isTrigger = true;
+        
     }
 
     private void ResetFixing()

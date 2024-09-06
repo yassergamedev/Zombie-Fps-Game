@@ -14,7 +14,7 @@ public class Zombie : MonoBehaviour
     private float lastAttackTime = 0f;
     public float chaseSpeed = 3.5f;
     public float idleSpeed = 1.0f;
-
+    public Vector3 rotationOffset;
     public Transform playerTransform;
     private PlayerHealth playerHealth;
 
@@ -77,6 +77,7 @@ public class Zombie : MonoBehaviour
 
         // Disable NavMeshAgent auto-movement
         navMeshAgent.updateRotation = false;
+        originalSpeed = navMeshAgent.speed;
     }
 
     private bool CanMoveInDirection(Vector3 direction)
@@ -150,8 +151,13 @@ public class Zombie : MonoBehaviour
         // Manually rotate the zombie to face the direction it's moving
         if (direction != Vector3.zero)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
+            // Calculate the desired rotation towards the direction with the rotation offset applied
+            Quaternion targetRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(rotationOffset);
+
+            // Smoothly rotate towards the target rotation with the offset
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
+
     }
 
     void StopZombie()
@@ -239,14 +245,21 @@ public class Zombie : MonoBehaviour
             if (zombieAnimator != null)
             {
                 zombieAnimator.Play("Hit");
-                navMeshAgent.speed = 0;
+                if (!isFrozen)
+                {
+                    navMeshAgent.speed /= 2;
+                }
+                
                 hitSound.Play();
             }
             hasPlayedHitAnimation = true;
         }
         else
         {
-            navMeshAgent.speed = chaseSpeed;
+            if (!isFrozen)
+            {
+                navMeshAgent.speed = chaseSpeed;
+            }
         }
 
         if (health <= 0f)
@@ -344,7 +357,7 @@ public class Zombie : MonoBehaviour
         }
 
         // Store the original speed and stop the NavMeshAgent
-        originalSpeed = navMeshAgent.speed;
+        
         navMeshAgent.speed = 0f;
     }
 

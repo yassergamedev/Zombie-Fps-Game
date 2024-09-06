@@ -33,6 +33,7 @@ public class RandomWeapon : Interactable
         if (!isShuffling)
         {
             weaponController.SwitchWeapon(selectedWeaponIndex);
+            transform.parent.GetChild(0).gameObject.GetComponent<AmmoBox>().Close();
             Destroy(this.gameObject);
         }
     }

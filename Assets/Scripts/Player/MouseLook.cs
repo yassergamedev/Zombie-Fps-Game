@@ -54,6 +54,8 @@ public class MouseLook : MonoBehaviour
         // Apply rotation to the camera and player body
         transform.localRotation = Quaternion.Euler(currentRotation.x, 0f, 0f);
         playerBody.localRotation = Quaternion.Euler(0f, currentRotation.y, 0f);
+        if(mouseSensitivity != PlayerPrefs.GetFloat("MouseSensitivity", 1f) * sensitivityMultiplier)
+                mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 1f) * sensitivityMultiplier;
     }
 
     public void AddRecoil(float recoilX, float recoilY)

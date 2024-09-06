@@ -1,60 +1,86 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AtomicBombDrop : MonoBehaviour
 {
-    [SerializeField] private GameObject atomicBombPrefab;
-
- private Camera mainCamera;
- private Camera topCamera;
-    [SerializeField] private float timeSlowFactor = 0.1f;
-    [SerializeField] private AudioClip bombFallSound;
     [SerializeField] private AudioClip bombImpactSound;
     [SerializeField] private float explosionRadius = 20.0f;
     [SerializeField] private float explosionForce = 500.0f;
-
+    [SerializeField] private Image whiteOverlay; // Reference to the white overlay UI
+    [SerializeField] private float fadeDuration = 4.5f; // Duration for the fade effect
     private AudioSource audioSource;
 
-    void Start()
+    private void Start()
     {
-        audioSource = GameObject.FindGameObjectWithTag("PlayerUI").GetComponent<AudioSource>();
-        mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        topCamera = GameObject.FindGameObjectWithTag("TopCamera").GetComponent<Camera>();
+        // Setup the audio source and white overlay
+        audioSource = GetComponent<AudioSource>();
+        whiteOverlay = GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>();
+
+        if (whiteOverlay != null)
+        {
+            whiteOverlay.color = new Color(1, 1, 1, 0); // Fully transparent at start
+        }
+
+       
     }
 
-    public void ActivateAtomicBomb()
+    private void OnTriggerEnter(Collider other)
     {
-        StartCoroutine(AtomicBombSequence());
+        if (other.CompareTag("Player"))
+        {
+            StartCoroutine(AtomicBombSequence());
+        }
     }
 
     private IEnumerator AtomicBombSequence()
     {
-        // Slow down time
-        Time.timeScale = timeSlowFactor;
-        Time.fixedDeltaTime = Time.timeScale * 0.02f;
+        // Play the explosion sound
+        if (bombImpactSound != null)
+        {
+            audioSource.clip = bombImpactSound;
+            audioSource.Play();
+        }
 
-        // Spawn the bomb above the player and switch camera
-        GameObject bomb = Instantiate(atomicBombPrefab, transform.position + Vector3.up * 5, Quaternion.LookRotation(Vector3.down));
+        // Flash the screen white
+        StartCoroutine(FlashWhiteScreen());
 
-        bomb.GetComponent<AtomicBomb>().mainCamera = mainCamera;
-        bomb.GetComponent<AtomicBomb>().topCamera = topCamera;
-       
-        mainCamera.gameObject.SetActive(false);
-        topCamera.gameObject.SetActive(false);
+        // Find and kill all zombies
+        Zombie[] allZombies = FindObjectsOfType<Zombie>();
+        foreach (Zombie zombie in allZombies)
+        {
+            Rigidbody rb = zombie.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddExplosionForce(explosionForce, transform.position, explosionRadius, 1.0f, ForceMode.Impulse);
+            }
 
+            // Kill the zombie by dealing damage equal to its health
+            zombie.TakeDamage(zombie.health);
+        }
 
-        // Play bomb falling sound
-        audioSource.clip = bombFallSound;
-        audioSource.Play();
+        yield return null;
+    }
 
-      
-        yield return new WaitForSeconds(2.0f);
+    private IEnumerator FlashWhiteScreen()
+    {
+        if (whiteOverlay == null) yield break;
 
-        // Switch back to the main camera after the explosion
-        topCamera.gameObject.SetActive(true);
-        mainCamera.gameObject.SetActive(true);
-       
-        // Reset time scale
-       
+        // Make the screen fully white
+        whiteOverlay.color = new Color(1, 1, 1, 1); // Fully white
+        yield return new WaitForSeconds(0.5f); // Keep it white for half a second
+
+        // Gradually fade back to normal
+        float elapsedTime = 0.0f;
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(1, 0, elapsedTime / fadeDuration);
+            whiteOverlay.color = new Color(1, 1, 1, alpha);
+            yield return null;
+        }
+
+        // Make the screen fully transparent again
+        whiteOverlay.color = new Color(1, 1, 1, 0);
     }
 }

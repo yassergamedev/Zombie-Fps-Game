@@ -41,7 +41,7 @@ public class RPG : Weapon
         }
         else
         {
-            Reload();
+            Reload(controller);
         }
     }
 }

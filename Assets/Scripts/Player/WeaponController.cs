@@ -85,7 +85,7 @@ public class WeaponController : MonoBehaviour
             }
         }
 
-        if (Input.GetButton("Fire2"))
+        if (Input.GetButton("Fire2") )
         {
             // Check if the current weapon is an RPG
             if (!(currentWeapon is RPG))
@@ -199,6 +199,7 @@ public class WeaponController : MonoBehaviour
 
         currentWeapon = weapons[currentWeaponIndex].GetComponent<Weapon>();
         currentAmmo = currentWeapon.maxAmmo;
+        currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
         player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
         weaponTransform = currentWeapon.gameObject.transform;
         // Store the original position and rotation from the weaponHolder
@@ -209,7 +210,7 @@ public class WeaponController : MonoBehaviour
     IEnumerator Reload()
     {
         isReloading = true;
-        currentWeapon.Reload();
+        currentWeapon.Reload(this);
         yield return new WaitForSeconds(currentWeapon.reloadTime);
         currentAmmo = currentWeapon.maxAmmo;
         isReloading = false;

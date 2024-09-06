@@ -27,7 +27,7 @@ public class WaveSystem : MonoBehaviour
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        UpdateWaveNumberUI();
+       
        
     }
 
@@ -53,7 +53,7 @@ public class WaveSystem : MonoBehaviour
     {
         currentWaveIndex++;
         spawningWave = true;
-
+        UpdateWaveNumberUI();
         if (audioSource != null && waveStartSound != null)
         {
             audioSource.PlayOneShot(waveStartSound);
@@ -70,15 +70,12 @@ public class WaveSystem : MonoBehaviour
             
         }
 
-        UpdateWaveNumberUI();
+       
         spawningWave = false;
 
-        if (audioSource != null && waveCooldownSound != null)
-        {
-            audioSource.PlayOneShot(waveCooldownSound);
-        }
+       
 
-        yield return new WaitForSeconds(timeBetweenWaves);
+        
     }
 
     void SpawnZombie(GameObject zombiePrefab, Vector3 position, Quaternion rotation)
@@ -115,7 +112,7 @@ public class WaveSystem : MonoBehaviour
     {
         if (waveNumberText != null)
         {
-            waveNumberText.text = (currentWaveIndex + 1).ToString();
+            waveNumberText.text = (currentWaveIndex).ToString();
             waveNumberText.gameObject.GetComponent<Animator>().SetTrigger("Flicker");
         }
     }

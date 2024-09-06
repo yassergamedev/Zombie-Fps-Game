@@ -26,17 +26,21 @@ public class Pause : MonoBehaviour
 
     void PauseGame()
     {
-        isPaused = true;
-        // Show the pause menu
-        pauseMenu.SetActive(true);
-        // Pause the game
-        Time.timeScale = 0;
-        // Deactivate specified game objects
-        SetGameObjectsActive(false);
-        // Ensure cursor is visible
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-        playerUI.PauseTimers();
+        if(FindObjectOfType<PlayerHealth>().health > 0)
+        {
+            isPaused = true;
+            // Show the pause menu
+            pauseMenu.SetActive(true);
+            // Pause the game
+            Time.timeScale = 0;
+            // Deactivate specified game objects
+            SetGameObjectsActive(false);
+            // Ensure cursor is visible
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            playerUI.PauseTimers();
+        }
+       
         
     }
 

@@ -254,6 +254,7 @@ MonoBehaviour:
   topCamera: {fileID: 0}
   GameUI: {fileID: 0}
   cameraSwitchDelay: 3
+  whiteOverlay: {fileID: 0}
 --- !u!1 &5343066616741355676
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,13 +282,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5343066616741355676}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.028936211, y: -0.37886512, z: 0.5735242, w: 0.7257368}
-  m_LocalPosition: {x: 8.7, y: 7, z: -7.2}
+  m_LocalRotation: {x: -0.14180331, y: -0.22783498, z: 0.5564702, w: 0.7863358}
+  m_LocalPosition: {x: 3.8, y: 1.6, z: -12.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7570146968628434216}
-  m_LocalEulerAnglesHint: {x: 23.115, y: -39.346, z: 68.273}
+  m_LocalEulerAnglesHint: {x: 1.751, y: -31.089, z: 70.085}
 --- !u!20 &2807310947091582764
 Camera:
   m_ObjectHideFlags: 0

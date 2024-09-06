@@ -19,6 +19,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private Transform pointsTextParent;
 
     [SerializeField] private TextMeshProUGUI instaKillTimerText; // Text for InstaKill timer
+    [SerializeField] private TextMeshProUGUI pointsBoostTimerText; // Text for InstaKill timer
+    [SerializeField] private TextMeshProUGUI timeStopTimerText; // Text for InstaKill timer
 
     private List<Image> bulletImages = new List<Image>();
 
@@ -49,6 +51,15 @@ public class PlayerUI : MonoBehaviour
         {
             instaKillTimerText.gameObject.SetActive(false); // Ensure InstaKill timer is hidden initially
         }
+        if (pointsBoostTimerText != null)
+        {
+            pointsBoostTimerText.gameObject.SetActive(false); // Ensure pointsBoost timer is hidden initially
+        }
+        if (timeStopTimerText != null)
+        {
+            timeStopTimerText.gameObject.SetActive(false); // Ensure timeStop timer is hidden initially
+        }
+
 
         if (isPaused)
         {
@@ -97,7 +108,7 @@ public class PlayerUI : MonoBehaviour
         animText.transform.localPosition = customPosition;
 
         TextMeshProUGUI text = animText.GetComponent<TextMeshProUGUI>();
-        text.text = "+" + pointsAdded.ToString();
+        text.text =  pointsAdded.ToString();
         text.color = Color.yellow;
 
         animText.GetComponent<Animator>().Play("PointsAddedAnimation");
@@ -116,16 +127,13 @@ public class PlayerUI : MonoBehaviour
 
     public void StartInstaKillTimer(float duration, int instaKillDamage)
     {
-        if (instaKillCoroutine != null)
-        {
-            StopCoroutine(instaKillCoroutine);
-        }
+       
 
         instaKillTimeRemaining = duration;
         originalDamage = weaponController.currentWeapon.damage;
         weaponController.currentWeapon.damage = instaKillDamage;
 
-        instaKillCoroutine = StartCoroutine(InstaKillCountdown());
+       StartCoroutine(InstaKillCountdown());
         StartTimer(duration, "InstaKill");
     }
 
@@ -245,11 +253,30 @@ public class PlayerUI : MonoBehaviour
 
     public void StartTimer(float duration, string timer)
     {
-        if (instaKillTimerText != null)
+       
+
+        switch (timer)
         {
-            instaKillTimerText.gameObject.SetActive(true);
-            StartCoroutine(UpdateTimer(duration, timer));
+            case "InstaKill":
+                {
+                    instaKillTimerText.gameObject.SetActive(true);
+                    
+                    break;
+                }
+            case "Points Boost":
+                {
+                    pointsBoostTimerText.gameObject.SetActive(true);
+                   
+                    break;
+                }
+            case "Time Stop":
+                {
+                    timeStopTimerText.gameObject.SetActive(true);
+                   
+                    break;
+                }
         }
+        StartCoroutine(UpdateTimer(duration, timer));
     }
 
     private IEnumerator UpdateTimer(float duration, string timer)
@@ -260,13 +287,35 @@ public class PlayerUI : MonoBehaviour
         {
             if (!isPaused)
             {
-                instaKillTimerText.text = timer + " : " + timeRemaining.ToString("F1") + "s";
+                switch (timer){
+                    case "InstaKill":
+                        {
+                            instaKillTimerText.text = timer + " : " + instaKillTimeRemaining.ToString("F1") + "s";
+                           
+                            break;
+                        }
+                    case "Points Boost":
+                        {
+                            pointsBoostTimerText.text = timer + " : " + pointsBoostTimeRemaining.ToString("F1") + "s";
+                           
+                            break;
+                        }
+                    case "Time Stop":
+                        {
+                            timeStopTimerText.text = timer + " : " + timeStopTimeRemaining.ToString("F1") + "s";
+                            
+                            break;
+                        }
+                }
                 timeRemaining -= Time.deltaTime;
+
             }
             yield return null;
         }
 
         instaKillTimerText.gameObject.SetActive(false);
+        timeStopTimerText.gameObject.SetActive(false);
+        pointsBoostTimerText.gameObject.SetActive(false);
     }
 
 }

@@ -30,7 +30,7 @@ public class MainMenu : MonoBehaviour
 
         // Apply Mouse Sensitivity
         float mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 1f);
-        GameObject.FindWithTag("MainCamera")?.GetComponent<MouseLook>().SetMouseSensitivity(mouseSensitivity);
+        GameObject.FindGameObjectWithTag("MainCamera")?.GetComponent<MouseLook>().SetMouseSensitivity(mouseSensitivity);
 
         // Apply Fullscreen Mode
         bool isFullScreen = PlayerPrefs.GetInt("FullScreen", 1) == 1;

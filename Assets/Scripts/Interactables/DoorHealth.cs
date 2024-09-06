@@ -37,5 +37,6 @@ public class DoorHealth : MonoBehaviour
         isDamaged = false;
         door.isFixed = false;
         GetComponent<Collider>().isTrigger = false;
+        
     }
 }

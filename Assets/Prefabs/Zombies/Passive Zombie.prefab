@@ -1302,6 +1302,7 @@ MonoBehaviour:
   attackCooldown: 1
   chaseSpeed: 1.5
   idleSpeed: 1
+  rotationOffset: {x: 0, y: 22, z: 0}
   playerTransform: {fileID: 0}
   groundCheck: {fileID: 6003967653002823642}
   groundCheckRadius: 6.33

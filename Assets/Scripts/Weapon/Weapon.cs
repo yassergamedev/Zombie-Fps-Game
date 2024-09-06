@@ -8,10 +8,12 @@ public class Weapon : MonoBehaviour
     public float fireRate = 0.1f;
     public int maxAmmo = 30;
     public int ammoReserve = 90;
+    public int normalAmmoReserve = 90;
     public float reloadTime = 2f;
     public int pointsOnHit = 15;
     public AudioClip shootSound;
     public AudioClip reloadSound;
+    public AudioClip headshotSFX;
     public GameObject bulletHolePrefab;
     public GameObject muzzleFlashPrefab;
     public Transform muzzlePoint;
@@ -94,6 +96,7 @@ public class Weapon : MonoBehaviour
                     Zombie zombie = hitTransform.GetComponent<Zombie>();
                     if (zombie != null)
                     {
+                        PlayerInteract playerInteract = playerCamera.GetComponentInParent<PlayerInteract>();
                         float finalDamage = damage;
                         Debug.Log("Hit place" + hit.collider.name);
 
@@ -108,9 +111,12 @@ public class Weapon : MonoBehaviour
                         // Check if the hit collider is the zombie's head collider
                         if (hit.collider == zombie.headCollider)
                         {
+                            // Play headshot sound
+                            audioSource.PlayOneShot(headshotSFX);
                             Debug.Log("Headshot!");
                             finalDamage *= zombie.headshotMultiplier;
-
+                            if (!zombie.isDead)
+                                playerInteract.AddPoints(pointsOnHit);
                             // Deactivate the head's collider and mesh renderer
                             hit.collider.gameObject.SetActive(false);
                         }
@@ -119,7 +125,7 @@ public class Weapon : MonoBehaviour
                         zombie.TakeDamage(finalDamage);
 
                         // Add points if the zombie is not dead
-                        PlayerInteract playerInteract = playerCamera.GetComponentInParent<PlayerInteract>();
+                       
                         if (playerInteract != null)
                         {
                             if (!zombie.isDead)
@@ -127,7 +133,7 @@ public class Weapon : MonoBehaviour
                         }
                     }
                 }
-                else if (hit.collider != null && !hit.collider.isTrigger) // Ensure the raycast hit a collider that is not a trigger
+                else if (hit.collider != null && !hit.collider.isTrigger ) // Ensure the raycast hit a collider that is not a trigger
                 {
                     Quaternion rotation = Quaternion.LookRotation(hit.normal);
                     rotation *= Quaternion.Euler(rotationOffset);
@@ -180,7 +186,7 @@ public class Weapon : MonoBehaviour
     }
 
 
-    public void Reload()
+    public void Reload(WeaponController controller)
     {
         int ammoToReload = maxAmmo - currentAmmo;
 
@@ -202,6 +208,10 @@ public class Weapon : MonoBehaviour
         else
         {
             Debug.Log("No ammo in reserve or magazine already full.");
+            if (this is RPG)
+            {
+                controller.SwitchWeapon(0);
+            }
         }
     }
 }

@@ -20,16 +20,14 @@ public class AtomicBomb : MonoBehaviour
     void Start()
     {
         GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().health = 9999;
-        // Ensure the bomb has a Rigidbody component to fall due to gravity
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.useGravity = true;
+
         whiteOverlay = GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>();
-        // Get the audio source from the bomb itself
         audioSource = GetComponent<AudioSource>();
         GameUI = GameObject.FindGameObjectWithTag("GameUI");
         GameUI.SetActive(false);
 
-        // Initially, set the white overlay to be transparent
         if (whiteOverlay != null)
         {
             whiteOverlay.color = new Color(1, 1, 1, 0); // Fully transparent
@@ -39,65 +37,50 @@ public class AtomicBomb : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         Debug.Log("Atomic Collided with " + other.tag);
-        // Check if the bomb hit the ground or a valid surface
         if (other.CompareTag("Ground") || other.CompareTag("Player"))
         {
-            // Trigger the explosion
             StartCoroutine(TriggerExplosion());
         }
     }
 
     private IEnumerator TriggerExplosion()
     {
-        // Decouple the camera from the bomb and stop it from following the bomb
         bombCamera.transform.SetParent(null);
 
-        // Instantiate the explosion prefab
         Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
-        // Play the impact sound
         audioSource.clip = bombImpactSound;
         audioSource.Play();
 
-        // Start the camera shake coroutine
-        StartCoroutine(CameraShake(0.5f, 0.5f)); // Adjust duration and magnitude as needed
+        StartCoroutine(CameraShake(0.5f, 0.5f));
+        StartCoroutine(FlashWhiteScreen(0.5f, 4.5f));
 
-        // Flash the screen white
-        StartCoroutine(FlashWhiteScreen(0.5f, 1.5f)); // Adjust flash duration and fade duration as needed
+        // Find all zombies in the scene
+        Zombie[] allZombies = FindObjectsOfType<Zombie>();
 
-        // Find all zombies within the explosion radius
-        Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
-        foreach (Collider nearbyObject in colliders)
+        foreach (Zombie zombie in allZombies)
         {
-            Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
-            Zombie zombie = nearbyObject.GetComponent<Zombie>();
-
+            Rigidbody rb = zombie.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                // Apply upward force to zombies
+                // Apply explosion force (adjust position to center of explosion)
                 rb.AddExplosionForce(explosionForce, transform.position, explosionRadius, 1.0f, ForceMode.Impulse);
             }
 
-            if (zombie != null)
-            {
-                // Kill the zombie
-                zombie.TakeDamage(zombie.health);
-            }
+            // Kill the zombie by calling the Die or TakeDamage method
+            zombie.TakeDamage(zombie.health); 
         }
 
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = 0.02f;
 
-        // Wait for the camera switch delay to allow the explosion to be captured
         yield return new WaitForSeconds(cameraSwitchDelay);
 
-        // Switch back to the main camera
         bombCamera.gameObject.SetActive(false);
         topCamera.gameObject.SetActive(true);
         mainCamera.gameObject.SetActive(true);
         GameUI.SetActive(true);
 
-        // Destroy the bomb after explosion (delay destruction to allow camera capture)
         Destroy(gameObject, cameraSwitchDelay);
     }
 
@@ -125,14 +108,11 @@ public class AtomicBomb : MonoBehaviour
     private IEnumerator FlashWhiteScreen(float flashDuration, float fadeDuration)
     {
         GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().health = 100;
-        // Ensure whiteOverlay is not null
         if (whiteOverlay == null) yield break;
 
-        // Flash the screen white
         whiteOverlay.color = new Color(1, 1, 1, 1); // Fully white
         yield return new WaitForSeconds(flashDuration);
 
-        // Gradually fade out the white screen
         float elapsedTime = 0.0f;
         while (elapsedTime < fadeDuration)
         {
@@ -142,7 +122,6 @@ public class AtomicBomb : MonoBehaviour
             yield return null;
         }
 
-        // Ensure it's fully transparent at the end
         whiteOverlay.color = new Color(1, 1, 1, 0);
     }
 }

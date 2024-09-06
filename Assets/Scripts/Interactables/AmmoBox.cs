@@ -9,6 +9,7 @@ public class AmmoBox : Interactable
    
 
     public GameObject randomWeapon;
+    private GameObject currentRandomWeapon;
     public bool isOpened = false; // Track if the box has been opened
     private PlayerInteract playerInteract; // Reference to the player's interaction script
     private Animator boxAnimator; // Reference to the box's animator
@@ -17,6 +18,8 @@ public class AmmoBox : Interactable
     {
         playerInteract = FindObjectOfType<PlayerInteract>(); // Find the PlayerInteract component in the scene
         boxAnimator = GetComponentInParent<Animator>(); // Get the Animator component attached to the box
+        currentRandomWeapon = Instantiate(randomWeapon, transform.parent);
+        currentRandomWeapon.SetActive(false);
     }
 
     protected override void Interact()
@@ -39,7 +42,7 @@ public class AmmoBox : Interactable
             }
 
             // Start the weapon shuffling 
-            randomWeapon.SetActive(true);
+            currentRandomWeapon.SetActive(true);
 
             // Mark the box as opened
             isOpened = true;
@@ -48,6 +51,17 @@ public class AmmoBox : Interactable
         {
             Debug.Log("Not enough points to open the ammo box.");
         }
+    }
+
+    public void Close()
+    {
+        isOpened = false;
+        if (boxAnimator != null)
+        {
+            boxAnimator.SetTrigger("Close");
+        }
+        currentRandomWeapon = Instantiate(randomWeapon, transform.parent);
+        currentRandomWeapon.SetActive(false);
     }
 
  
