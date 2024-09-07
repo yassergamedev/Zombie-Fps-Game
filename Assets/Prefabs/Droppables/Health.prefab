@@ -131,6 +131,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  destroyAfter: 0
+  spawnTime: 20
 --- !u!114 &7125154472002334864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,4 +146,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthAmount: 20
-  audioClip: {fileID: 0}
+  audioClip: {fileID: 8300000, guid: c48a972d3d024c2408a3331750786a29, type: 3}

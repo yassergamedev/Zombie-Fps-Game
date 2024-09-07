@@ -116,21 +116,25 @@ public class Weapon : MonoBehaviour
                             Debug.Log("Headshot!");
                             finalDamage *= zombie.headshotMultiplier;
                             if (!zombie.isDead)
-                                playerInteract.AddPoints(pointsOnHit);
+                            playerInteract.AddPoints(pointsOnHit*2);
                             // Deactivate the head's collider and mesh renderer
                             hit.collider.gameObject.SetActive(false);
                         }
-
+                        else
+                        {
+                            if (playerInteract != null)
+                            {
+                                if (!zombie.isDead)
+                                    playerInteract.AddPoints(pointsOnHit);
+                            }
+                        }
+                        
                         // Apply damage to the zombie
                         zombie.TakeDamage(finalDamage);
 
                         // Add points if the zombie is not dead
                        
-                        if (playerInteract != null)
-                        {
-                            if (!zombie.isDead)
-                                playerInteract.AddPoints(pointsOnHit);
-                        }
+                       
                     }
                 }
                 else if (hit.collider != null && !hit.collider.isTrigger ) // Ensure the raycast hit a collider that is not a trigger

@@ -106,7 +106,7 @@ public class Door : Interactable
         // Subtract points from the player
         if (playerInteract != null)
         {
-            playerInteract.AddPoints(-requiredPoints);
+            playerInteract.AddPoints(100);
         }
 
         // Hide the loading slider

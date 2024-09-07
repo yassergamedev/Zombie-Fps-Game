@@ -24,19 +24,20 @@ public class WaveSystem : MonoBehaviour
     public int remainingZombies = 0;
     private int deathCounter = 0; // Counter to track the number of zombie deaths
 
+    private bool isTimeStopped = false; // Flag to check if time stop is active
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-       
-       
     }
 
     void Update()
     {
-        if (!spawningWave && remainingZombies <= 0)
+        // Only start a new wave if not currently spawning and no zombies remaining
+        if (!spawningWave && remainingZombies <= 0 && !isTimeStopped)
         {
-            Debug.Log("starting wave");
             StartCoroutine(StartNextWave());
+
             // Track the highest wave the player has reached
             int highestWave = PlayerPrefs.GetInt("WaveMax", 0);
             if (currentWaveIndex > highestWave)
@@ -47,35 +48,37 @@ public class WaveSystem : MonoBehaviour
         }
     }
 
-   
-
     IEnumerator StartNextWave()
     {
         currentWaveIndex++;
         spawningWave = true;
         UpdateWaveNumberUI();
+
         if (audioSource != null && waveStartSound != null)
         {
             audioSource.PlayOneShot(waveStartSound);
         }
+
         yield return new WaitForSeconds(timeBetweenWaves); // Wait before starting wave
+
         int zombieCount = Mathf.Min(Mathf.RoundToInt(initialZombieCount * Mathf.Pow(spawnRateMultiplier, currentWaveIndex)), maxZombiesPerWave);
         remainingZombies = zombieCount;
 
         for (int i = 0; i < zombieCount; i++)
         {
-                    Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-                    SpawnZombie(zombiePrefabs[(int)Random.Range(0, 2)], spawnPoint.position, spawnPoint.rotation);
-                    yield return new WaitForSeconds(spawnInterval);
-            
+            // Pause spawning if time stop is active
+            while (isTimeStopped)
+            {
+                
+                yield return null; // Wait until time stop ends
+            }
+
+            Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            SpawnZombie(zombiePrefabs[(int)Random.Range(0, 2)], spawnPoint.position, spawnPoint.rotation);
+            yield return new WaitForSeconds(spawnInterval);
         }
 
-       
         spawningWave = false;
-
-       
-
-        
     }
 
     void SpawnZombie(GameObject zombiePrefab, Vector3 position, Quaternion rotation)
@@ -120,9 +123,15 @@ public class WaveSystem : MonoBehaviour
     // Method to change spawn points based on player location
     public void UpdateSpawnPoints(Transform[] newSpawnPoints)
     {
-        if (newSpawnPoints.Length > 0) {
+        if (newSpawnPoints.Length > 0)
+        {
             spawnPoints = newSpawnPoints;
         }
-        
+    }
+
+    // Method to set isTimeStopped flag (to be called by TimeStop script)
+    public void SetTimeStop(bool value)
+    {
+        isTimeStopped = value;
     }
 }

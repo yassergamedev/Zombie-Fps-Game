@@ -13,7 +13,8 @@ public class PlayerHealth : MonoBehaviour
     private float lerpTimer;
     public float maxHealth = 100f;
     public float chipSpeed = 2f;
-
+    public float healthRegenDelay = 4f;
+    public float healthRegenRestoredPerSecond = 5f;
     [Header("Damage Overlay")]
     public Image overlay;
     public float duration; // How long the image stays fully opaque
@@ -38,6 +39,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        playerAnimator.enabled = false;
         health = maxHealth;
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
         deathScreen.SetActive(false); // Hide the death screen initially
@@ -136,13 +138,13 @@ public class PlayerHealth : MonoBehaviour
     IEnumerator HealthRegenDelay()
     {
         // Wait for 4 seconds before starting health regeneration
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(healthRegenDelay);
 
         // Continue regenerating health while the player is not dead and health is not full
         while (!isDead && health < maxHealth)
         {
-            RestoreHealth(5f); // Restore a fixed amount per tick, adjust as needed
-            yield return new WaitForSeconds(0.5f); // Adjust the interval between health restoration ticks
+            RestoreHealth(healthRegenRestoredPerSecond); // Restore a fixed amount per tick, adjust as needed
+            yield return new WaitForSeconds(1f); // Adjust the interval between health restoration ticks
         }
     }
 
@@ -158,11 +160,11 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         isDead = true;
-
+        playerAnimator.enabled = true;
         // Play death animation
         if (playerAnimator != null)
         {
-            playerAnimator.SetTrigger("Die");
+            playerAnimator.Play("Die");
         }
 
         // Play death sound

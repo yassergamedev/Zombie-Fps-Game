@@ -43,6 +43,7 @@ public class Rocket : MonoBehaviour
         // Destroy the rocket
         Destroy(gameObject);
     }
+ 
 
     private void HandleExplosionEffects()
     {
@@ -65,7 +66,6 @@ public class Rocket : MonoBehaviour
                 // Make the zombie die instantly
                 zombie.TakeDamage(zombie.health);
 
-               
             }
         }
     }

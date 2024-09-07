@@ -123,7 +123,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useEvents: 0
   promptMessage: '(E) Repair '
-  requiredPoints: 0
+  requiredPoints: -100
   holdTime: 2
   isFixed: 1
   loadingSlider: {fileID: 0}

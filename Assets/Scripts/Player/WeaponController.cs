@@ -147,6 +147,7 @@ public class WeaponController : MonoBehaviour
         {
             if (!isFocusing)
             {
+               
                 // Smoothly reset to the original position and rotation
                 weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, originalPosition, Time.deltaTime * focusSpeed);
                 weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, originalRotation, Time.deltaTime * focusSpeed);
@@ -160,13 +161,20 @@ public class WeaponController : MonoBehaviour
     {
         if (isFocusing)
         {
+            currentWeapon.weaponAnimator.speed = 0f;
             // Calculate target position and rotation when focusing
             Vector3 targetPosition = currentWeapon.positionOffset;
             Quaternion targetRotation =  Quaternion.Euler(currentWeapon.rotationOffset);
 
-            // Smoothly interpolate position and rotation
-            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, targetPosition, Time.deltaTime * focusSpeed);
-            weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, targetRotation, Time.deltaTime * focusSpeed);
+            if (weaponTransform.localPosition != targetPosition) {
+                // Smoothly interpolate position and rotation
+                weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, targetPosition, Time.deltaTime * focusSpeed);
+
+            }
+            if (weaponTransform.localRotation != targetRotation) {
+                weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, targetRotation, Time.deltaTime * focusSpeed);
+
+            }
 
             // Optionally, you can Slerp the camera's field of view for a zoom effect
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomedFOV, Time.deltaTime * zoomSpeed);
@@ -174,9 +182,17 @@ public class WeaponController : MonoBehaviour
         }
         else
         {
+            currentWeapon.weaponAnimator.speed = 1f;
             // Smoothly reset to the original position and rotation
-           weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, originalPosition, Time.deltaTime * focusSpeed);
-            weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, originalRotation, Time.deltaTime * focusSpeed);
+            if (weaponTransform.localPosition != originalPosition)
+            {
+                weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, originalPosition, Time.deltaTime * focusSpeed);
+
+            }
+            if (weaponTransform.localRotation != originalRotation) {
+                weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, originalRotation, Time.deltaTime * focusSpeed);
+
+            }
 
             //Reset the camera's field of view
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, defaultFOV, Time.deltaTime * zoomSpeed);

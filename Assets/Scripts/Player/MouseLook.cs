@@ -18,7 +18,7 @@ public class MouseLook : MonoBehaviour
     public float recoilRandomness = 0.1f; // Amount of randomness to add to recoil
     private Vector2 currentRecoil = Vector2.zero;
     private Vector2 targetRecoil = Vector2.zero;
-
+    private WeaponController controller;
     void Start()
     {
         mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 1f) * sensitivityMultiplier;
@@ -26,6 +26,7 @@ public class MouseLook : MonoBehaviour
 
         currentRotation = transform.localEulerAngles;
         yRotation = playerBody.eulerAngles.y;
+        controller = FindAnyObjectByType<WeaponController>();
     }
 
     public void SetMouseSensitivity(float sens)
@@ -40,7 +41,10 @@ public class MouseLook : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
         // Apply recoil (reduce recoil over time)
-        currentRecoil = Vector2.Lerp(currentRecoil, Vector2.zero, Time.deltaTime * recoilReturnSpeed);
+        
+            currentRecoil = Vector2.Lerp(currentRecoil, Vector2.zero, Time.deltaTime * recoilReturnSpeed);
+        
+        
 
         // Apply mouse input along with recoil
         yRotation += mouseX - currentRecoil.y * Time.deltaTime;
@@ -49,7 +53,9 @@ public class MouseLook : MonoBehaviour
 
         // Smoothly interpolate the rotation for the camera along X-axis
         Vector3 targetRotation = new Vector3(xRotation, yRotation, 0f);
-        currentRotation = Vector3.SmoothDamp(currentRotation, targetRotation, ref rotationVelocity, smoothTime);
+         currentRotation = Vector3.SmoothDamp(currentRotation, targetRotation, ref rotationVelocity, smoothTime);
+      
+        
 
         // Apply rotation to the camera and player body
         transform.localRotation = Quaternion.Euler(currentRotation.x, 0f, 0f);
@@ -64,7 +70,6 @@ public class MouseLook : MonoBehaviour
         float randomRecoilX =  recoilX;
         float randomRecoilY = Random.Range(-recoilY, recoilY);
 
-        // Smoothly apply recoil (with a lower intensity)
         targetRecoil = Vector2.Lerp(targetRecoil, new Vector2(randomRecoilX, randomRecoilY), Time.deltaTime * recoilReturnSpeed);
         currentRecoil = Vector2.Lerp(currentRecoil, targetRecoil, Time.deltaTime * recoilReturnSpeed);
     }

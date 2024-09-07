@@ -119,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Handle Sprinting
-if (Input.GetButton("Sprint") && weaponController.currentWeapon.isSprintable && !weaponController.isFocusing)
+if (Input.GetButton("Sprint") && weaponController.currentWeapon.isSprintable && !weaponController.isFocusing && (x != 0 || z != 0) )
 {
     isSprinting = true;
 
@@ -139,6 +139,7 @@ if (Input.GetButton("Sprint") && weaponController.currentWeapon.isSprintable && 
 }
 else
 {
+            Debug.Log("is not focusing");
     if (runningSound.pitch > 0.66f)
         runningSound.pitch -= 0.33f;
     isSprinting = false;

@@ -34,7 +34,7 @@ public class InstaKill : MonoBehaviour
             audioSource.clip = instaKillSound;
             audioSource.Play();
 
-           
+            playerUI.StartTimer(instaKillDuration, "InstaKill");
             playerUI.StartInstaKillTimer(instaKillDuration,instaKillDamage);
 
         }

@@ -27,9 +27,9 @@ public class PlayerUI : MonoBehaviour
     private Coroutine instaKillCoroutine;
     private Coroutine pointsBoostCoroutine;
     private Coroutine timeStopCoroutine;
-
-
-    [SerializeField] private bool isPaused = false;
+    private WaveSystem waveSystem;
+    float[] originalDamages;
+   [SerializeField] private bool isPaused = false;
 
     // Store the remaining time
 
@@ -66,6 +66,11 @@ public class PlayerUI : MonoBehaviour
             ResumeTimers();
         }
         weaponController = GetComponent<WeaponController>();
+        waveSystem = FindObjectOfType<WaveSystem>();
+        if (waveSystem == null)
+        {
+            Debug.LogError("WaveSystem not found in the scene.");
+        }
     }
 
     public void UpdateText(string promptMessage)
@@ -127,15 +132,28 @@ public class PlayerUI : MonoBehaviour
 
     public void StartInstaKillTimer(float duration, int instaKillDamage)
     {
-       
-
         instaKillTimeRemaining = duration;
-        originalDamage = weaponController.currentWeapon.damage;
-        weaponController.currentWeapon.damage = instaKillDamage;
 
-       StartCoroutine(InstaKillCountdown());
+       
+       originalDamages = new float[weaponController.weapons.Count];
+
+      
+        for (int i = 0; i < weaponController.weapons.Count; i++)
+        {
+           
+            originalDamages[i] = weaponController.weapons[i].GetComponent<Weapon>().damage;
+
+            
+            weaponController.weapons[i].GetComponent<Weapon>().damage = instaKillDamage;
+        }
+
+       
+        StartCoroutine(InstaKillCountdown());
+
+        
         StartTimer(duration, "InstaKill");
     }
+
 
     private IEnumerator InstaKillCountdown()
     {
@@ -148,7 +166,12 @@ public class PlayerUI : MonoBehaviour
             yield return null;
         }
 
-        weaponController.currentWeapon.damage = originalDamage;
+       
+        // After the timer, reset the damage values to their original values
+        for (int i = 0; i < weaponController.weapons.Count; i++)
+        {
+            weaponController.weapons[i].GetComponent<Weapon>().damage = originalDamages[i];
+        }
     }
 
     public void StartPointsBoostTimer(float duration, int pointsMultiplier)
@@ -203,7 +226,8 @@ public class PlayerUI : MonoBehaviour
             }
             yield return null;
         }
-
+        //  UnPause the spawning in WaveSystem
+        waveSystem.SetTimeStop(false);
         UnfreezeZombies();
     }
 
@@ -272,7 +296,8 @@ public class PlayerUI : MonoBehaviour
             case "Time Stop":
                 {
                     timeStopTimerText.gameObject.SetActive(true);
-                   
+                    // Pause the spawning in WaveSystem
+                    waveSystem.SetTimeStop(true);
                     break;
                 }
         }
