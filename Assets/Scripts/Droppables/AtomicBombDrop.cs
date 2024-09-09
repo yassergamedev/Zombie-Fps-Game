@@ -11,24 +11,28 @@ public class AtomicBombDrop : MonoBehaviour
     [SerializeField] private float fadeDuration = 4.5f; // Duration for the fade effect
     private AudioSource audioSource;
     private PlayerInteract playerInteract;
+    private Collider bombCollider;
+
     private void Start()
     {
-        // Setup the audio source and white overlay
+        // Setup the audio source, bomb collider, and white overlay
         audioSource = GetComponent<AudioSource>();
+        bombCollider = GetComponent<Collider>();
         whiteOverlay = GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>();
         playerInteract = FindAnyObjectByType<PlayerInteract>();
+
         if (whiteOverlay != null)
         {
             whiteOverlay.color = new Color(1, 1, 1, 0); // Fully transparent at start
         }
-
-       
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            // Disable the bomb's collider to prevent further triggers
+            bombCollider.enabled = false;
             StartCoroutine(AtomicBombSequence());
         }
     }
@@ -58,8 +62,15 @@ public class AtomicBombDrop : MonoBehaviour
             // Kill the zombie by dealing damage equal to its health
             zombie.TakeDamage(zombie.health);
         }
+
+        // Award points to the player
         playerInteract.AddPoints(allZombies.Length * 50);
-        yield return null;
+
+        // Wait until the white overlay fades out before destroying the bomb object
+        yield return new WaitForSeconds(fadeDuration + 0.5f); // Wait for fade to finish before removing the bomb
+
+        // Optionally destroy the bomb game object after the effect completes
+        Destroy(gameObject);
     }
 
     private IEnumerator FlashWhiteScreen()

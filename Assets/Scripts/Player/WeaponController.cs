@@ -241,6 +241,7 @@ public class WeaponController : MonoBehaviour
             currentWeapon = weapons[currentWeaponIndex].weaponPrefab.GetComponent<Weapon>();
             currentAmmo = currentWeapon.maxAmmo;
             currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
+            currentWeapon.currentAmmo = currentWeapon.maxAmmo;
             player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
             weaponTransform = currentWeapon.gameObject.transform;
             // Store the original position and rotation from the weaponHolder

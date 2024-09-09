@@ -116,6 +116,10 @@ PrefabInstance:
       value: Zombie
       objectReference: {fileID: 0}
     - target: {fileID: 1558550861520152, guid: 227ee07e9e5b7914ba8fbb8f430be9a5, type: 3}
+      propertyPath: m_Name
+      value: head
+      objectReference: {fileID: 0}
+    - target: {fileID: 1558550861520152, guid: 227ee07e9e5b7914ba8fbb8f430be9a5, type: 3}
       propertyPath: m_TagString
       value: Zombie
       objectReference: {fileID: 0}
@@ -994,9 +998,6 @@ PrefabInstance:
       addedObject: {fileID: 6515405960932915222}
     - targetCorrespondingSourceObject: {fileID: 1126640200827478, guid: 227ee07e9e5b7914ba8fbb8f430be9a5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4203518884717102982}
-    - targetCorrespondingSourceObject: {fileID: 1126640200827478, guid: 227ee07e9e5b7914ba8fbb8f430be9a5, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 767796893719069886}
     - targetCorrespondingSourceObject: {fileID: 1126640200827478, guid: 227ee07e9e5b7914ba8fbb8f430be9a5, type: 3}
       insertIndex: -1
@@ -1507,27 +1508,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1126640200827478, guid: 227ee07e9e5b7914ba8fbb8f430be9a5, type: 3}
   m_PrefabInstance: {fileID: 3319460495020255605}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &4203518884717102982
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3320585692092443427}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.42076626, y: 0.9276498, z: 0.5535715}
-  m_Center: {x: -0.2103856, y: -0.29800746, z: 0.017339557}
 --- !u!54 &767796893719069886
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2201,9 +2181,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.52945364
-  m_Height: 3.4760985
+  m_Height: 3.6822448
   m_Direction: 1
-  m_Center: {x: 0.0000000022761828, y: 1.2380476, z: 0.32183814}
+  m_Center: {x: 0.0000000022761828, y: 1.3411205, z: 0.32183814}
 --- !u!82 &3365201382316602398
 AudioSource:
   m_ObjectHideFlags: 0
