@@ -74,7 +74,7 @@ public class WaveSystem : MonoBehaviour
             }
 
             Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            SpawnZombie(zombiePrefabs[(int)Random.Range(0, 2)], spawnPoint.position, spawnPoint.rotation);
+            SpawnZombie(zombiePrefabs[(int)Random.Range(0, zombiePrefabs.Length)], spawnPoint.position, spawnPoint.rotation);
             yield return new WaitForSeconds(spawnInterval);
         }
 
@@ -121,11 +121,12 @@ public class WaveSystem : MonoBehaviour
     }
 
     // Method to change spawn points based on player location
-    public void UpdateSpawnPoints(Transform[] newSpawnPoints)
+    public void UpdateSpawnPoints(Transform[] newSpawnPoints, GameObject[] enemies)
     {
         if (newSpawnPoints.Length > 0)
         {
             spawnPoints = newSpawnPoints;
+            zombiePrefabs = enemies;
         }
     }
 

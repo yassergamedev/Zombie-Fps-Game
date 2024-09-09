@@ -57,7 +57,7 @@ public class Zombie : MonoBehaviour
     public bool activateRagDollOnDeath;
     public float raycastDistance = 0.5f; // Distance for raycasting to check for obstacles
     private WaveSystem waveSystem;
-
+    public float attackDelay = 10f;
     public bool isPassive;
     void Start()
     {
@@ -220,7 +220,7 @@ public class Zombie : MonoBehaviour
 
             if (isPassive)
             {
-                yield return new WaitForSeconds(stateInfo.length / 10); // Wait until 4th way through the animation
+                yield return new WaitForSeconds(stateInfo.length / attackDelay); // Wait until 4th way through the animation
             }
             else
             {

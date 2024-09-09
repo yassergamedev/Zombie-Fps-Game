@@ -3,7 +3,7 @@ using UnityEngine;
 public class SpawnAreaTrigger : MonoBehaviour
 {
     public Transform[] areaSpawnPoints; // Spawn points for this area
-
+    public GameObject[] EnemyPrefabs; // EnemyPrefabs
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -11,7 +11,7 @@ public class SpawnAreaTrigger : MonoBehaviour
             WaveSystem waveSystem = FindObjectOfType<WaveSystem>();
             if (waveSystem != null)
             {
-                waveSystem.UpdateSpawnPoints(areaSpawnPoints);
+                waveSystem.UpdateSpawnPoints(areaSpawnPoints,EnemyPrefabs);
             }
         }
     }
@@ -22,7 +22,7 @@ public class SpawnAreaTrigger : MonoBehaviour
             WaveSystem waveSystem = FindObjectOfType<WaveSystem>();
             if (waveSystem != null)
             {
-                waveSystem.UpdateSpawnPoints(areaSpawnPoints);
+                waveSystem.UpdateSpawnPoints(areaSpawnPoints, EnemyPrefabs);
             }
         }
     }

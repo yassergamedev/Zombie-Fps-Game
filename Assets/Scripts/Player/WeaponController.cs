@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 public class WeaponController : MonoBehaviour
 {
     public Camera playerCamera;
-
+    public PlayerUI playerUI;
     public float shakeAmount = 0.1f;
 
     [Header("Focus Settings")]
@@ -48,6 +48,7 @@ public class WeaponController : MonoBehaviour
     private Quaternion originalCameraRotation;
     public bool isRecoiling = false;
     public bool isFocusing = false;
+
     void Start()
     {
        
@@ -93,7 +94,7 @@ public class WeaponController : MonoBehaviour
             }
         }
 
-        if (Input.GetButton("Fire2"))
+        if (Input.GetButton("Fire2") && !isReloading)
         {
             // Check if the current weapon is an RPG
             if (!(currentWeapon is RPG))
@@ -176,7 +177,7 @@ public class WeaponController : MonoBehaviour
     }
     void FocusWeapon(bool isFocusing)
     {
-        if (isFocusing)
+        if (isFocusing && !isReloading)
         {
             currentWeapon.gameObject.GetComponent<WeaponSway>().enabled = false;
             currentWeapon.weaponAnimator.speed = 0f;
@@ -245,11 +246,13 @@ public class WeaponController : MonoBehaviour
             // Store the original position and rotation from the weaponHolder
             originalPosition = weaponTransform.localPosition;
             originalRotation = weaponTransform.localRotation;
+            playerUI.UpdateAmmoText(currentAmmo, currentWeapon.ammoReserve);
         }
     }
 
     IEnumerator Reload()
     {
+        
         isReloading = true;
         currentWeapon.Reload(this);
         yield return new WaitForSeconds(currentWeapon.reloadTime);
