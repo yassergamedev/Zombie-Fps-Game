@@ -18,9 +18,17 @@ public class WeaponController : MonoBehaviour
     public float zoomedFOV = 30f;
     public float defaultFOV = 60f;
     public float zoomSpeed = 5f;
-
+    [System.Serializable]
+    public struct WeaponEntry
+    {
+        public GameObject weaponPrefab;
+        public bool isAvailable;
+    }
+    [SerializeField] public List<WeaponEntry> weapons;
     [Header("Weapon Switching")]
-    public List<GameObject> weapons;
+
+   
+
     private int currentWeaponIndex = 0;
     public Weapon currentWeapon;
     private Transform weaponTransform;
@@ -85,7 +93,7 @@ public class WeaponController : MonoBehaviour
             }
         }
 
-        if (Input.GetButton("Fire2") )
+        if (Input.GetButton("Fire2"))
         {
             // Check if the current weapon is an RPG
             if (!(currentWeapon is RPG))
@@ -111,10 +119,7 @@ public class WeaponController : MonoBehaviour
             isFocusing = false;
         }
 
-        if (Input.GetButtonDown("SwitchWeapon"))
-        {
-            SwitchWeapon((currentWeaponIndex + 1) % weapons.Count);
-        }
+        HandleWeaponSwitchInput();
 
         if (Input.GetButtonDown("Reload") && !isReloading && currentAmmo < currentWeapon.maxAmmo)
         {
@@ -129,6 +134,18 @@ public class WeaponController : MonoBehaviour
             WeaponSprintPosition();
         }
     }
+    void HandleWeaponSwitchInput()
+    {
+        for (int i = 1; i <= 6; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + (i - 1)))
+            {
+                SwitchWeapon(i - 1); // Switch to weapon based on index (0-based)
+                break;
+            }
+        }
+    }
+
     void WeaponSprintPosition()
     {
         if (playerMovement.isSprinting)
@@ -161,6 +178,7 @@ public class WeaponController : MonoBehaviour
     {
         if (isFocusing)
         {
+            currentWeapon.gameObject.GetComponent<WeaponSway>().enabled = false;
             currentWeapon.weaponAnimator.speed = 0f;
             // Calculate target position and rotation when focusing
             Vector3 targetPosition = currentWeapon.positionOffset;
@@ -171,10 +189,12 @@ public class WeaponController : MonoBehaviour
                 weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, targetPosition, Time.deltaTime * focusSpeed);
 
             }
+            
             if (weaponTransform.localRotation != targetRotation) {
                 weaponTransform.localRotation = Quaternion.Slerp(weaponTransform.localRotation, targetRotation, Time.deltaTime * focusSpeed);
 
             }
+           
 
             // Optionally, you can Slerp the camera's field of view for a zoom effect
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, zoomedFOV, Time.deltaTime * zoomSpeed);
@@ -182,6 +202,8 @@ public class WeaponController : MonoBehaviour
         }
         else
         {
+            currentWeapon.gameObject.GetComponent<WeaponSway>().enabled = true;
+           
             currentWeapon.weaponAnimator.speed = 1f;
             // Smoothly reset to the original position and rotation
             if (weaponTransform.localPosition != originalPosition)
@@ -204,23 +226,26 @@ public class WeaponController : MonoBehaviour
 
     public void SwitchWeapon(int weaponIndex)
     {
-        if (weapons.Count > 0)
+        if (weapons[weaponIndex].isAvailable)
         {
-            weapons[currentWeaponIndex].SetActive(false);
-           
+            if (weapons.Count > 0)
+            {
+                weapons[currentWeaponIndex].weaponPrefab.SetActive(false);
+
+            }
+
+            currentWeaponIndex = weaponIndex;
+            weapons[currentWeaponIndex].weaponPrefab.SetActive(true);
+
+            currentWeapon = weapons[currentWeaponIndex].weaponPrefab.GetComponent<Weapon>();
+            currentAmmo = currentWeapon.maxAmmo;
+            currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
+            player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
+            weaponTransform = currentWeapon.gameObject.transform;
+            // Store the original position and rotation from the weaponHolder
+            originalPosition = weaponTransform.localPosition;
+            originalRotation = weaponTransform.localRotation;
         }
-
-        currentWeaponIndex = weaponIndex;
-        weapons[currentWeaponIndex].SetActive(true);
-
-        currentWeapon = weapons[currentWeaponIndex].GetComponent<Weapon>();
-        currentAmmo = currentWeapon.maxAmmo;
-        currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
-        player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
-        weaponTransform = currentWeapon.gameObject.transform;
-        // Store the original position and rotation from the weaponHolder
-        originalPosition = weaponTransform.localPosition;
-        originalRotation = weaponTransform.localRotation;
     }
 
     IEnumerator Reload()

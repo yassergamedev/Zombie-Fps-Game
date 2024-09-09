@@ -22,7 +22,7 @@ public class MainMenu : MonoBehaviour
         // Apply Resolution
         int resolutionIndex = PlayerPrefs.GetInt("ResolutionIndex", 0);
         Resolution[] resolutions = Screen.resolutions;
-        if (resolutionIndex >= 0 && resolutionIndex < resolutions.Length)
+        if (resolutionIndex >= 1 && resolutionIndex < resolutions.Length)
         {
             Resolution resolution = resolutions[resolutionIndex];
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);

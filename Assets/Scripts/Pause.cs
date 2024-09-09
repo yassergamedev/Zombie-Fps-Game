@@ -1,5 +1,6 @@
+using System.Drawing;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class Pause : MonoBehaviour
 {
     public GameObject pauseMenu; // Assign the PauseMenu GameObject in the Inspector
@@ -57,6 +58,8 @@ public class Pause : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         playerUI.ResumeTimers();
+        GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>().color = new UnityEngine.Color(1, 1, 1, 0);
+        StartCoroutine(playerUI.gameObject.GetComponent<PlayerHealth>().HealthRegenDelay());
     }
 
     void SetGameObjectsActive(bool isActive)

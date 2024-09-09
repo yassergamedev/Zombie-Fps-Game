@@ -80,6 +80,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  destroyAfter: 0
+  spawnTime: 20
 --- !u!65 &4516673858479223863
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -867,6 +869,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7924530069148709341, guid: a519f03aee53c45bebfe44df6939bd67, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4bdb137a8ca828c429d1e13496ba7c7c, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

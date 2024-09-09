@@ -1327,6 +1327,7 @@ MonoBehaviour:
   headCollider: {fileID: 5114171722195118300}
   activateRagDollOnDeath: 0
   raycastDistance: 0.5
+  isPassive: 1
 --- !u!82 &757795054677566184
 AudioSource:
   m_ObjectHideFlags: 0

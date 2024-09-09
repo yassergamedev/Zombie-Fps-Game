@@ -10,13 +10,13 @@ public class AtomicBombDrop : MonoBehaviour
     [SerializeField] private Image whiteOverlay; // Reference to the white overlay UI
     [SerializeField] private float fadeDuration = 4.5f; // Duration for the fade effect
     private AudioSource audioSource;
-
+    private PlayerInteract playerInteract;
     private void Start()
     {
         // Setup the audio source and white overlay
         audioSource = GetComponent<AudioSource>();
         whiteOverlay = GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>();
-
+        playerInteract = FindAnyObjectByType<PlayerInteract>();
         if (whiteOverlay != null)
         {
             whiteOverlay.color = new Color(1, 1, 1, 0); // Fully transparent at start
@@ -58,7 +58,7 @@ public class AtomicBombDrop : MonoBehaviour
             // Kill the zombie by dealing damage equal to its health
             zombie.TakeDamage(zombie.health);
         }
-
+        playerInteract.AddPoints(allZombies.Length * 50);
         yield return null;
     }
 

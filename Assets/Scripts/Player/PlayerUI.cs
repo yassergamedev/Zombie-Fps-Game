@@ -141,10 +141,10 @@ public class PlayerUI : MonoBehaviour
         for (int i = 0; i < weaponController.weapons.Count; i++)
         {
            
-            originalDamages[i] = weaponController.weapons[i].GetComponent<Weapon>().damage;
+            originalDamages[i] = weaponController.weapons[i].weaponPrefab.GetComponent<Weapon>().damage;
 
             
-            weaponController.weapons[i].GetComponent<Weapon>().damage = instaKillDamage;
+            weaponController.weapons[i].weaponPrefab.GetComponent<Weapon>().damage = instaKillDamage;
         }
 
        
@@ -170,7 +170,7 @@ public class PlayerUI : MonoBehaviour
         // After the timer, reset the damage values to their original values
         for (int i = 0; i < weaponController.weapons.Count; i++)
         {
-            weaponController.weapons[i].GetComponent<Weapon>().damage = originalDamages[i];
+            weaponController.weapons[i].weaponPrefab.GetComponent<Weapon>().damage = originalDamages[i];
         }
     }
 

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using static WeaponController;
 
 public class RandomWeapon : Interactable
 {
@@ -32,7 +34,25 @@ public class RandomWeapon : Interactable
     {
         if (!isShuffling)
         {
+
+
+         
+            // Check if the weapon is not available in the weapon list
+            if (!weaponController.weapons[selectedWeaponIndex].isAvailable)
+            {
+                // Retrieve the WeaponEntry from the list
+                WeaponEntry entry = weaponController.weapons[selectedWeaponIndex];
+
+               
+                entry.isAvailable = true;
+
+                // Reassign the modified struct back to the list
+                weaponController.weapons[selectedWeaponIndex] = entry;
+            }
+
             weaponController.SwitchWeapon(selectedWeaponIndex);
+
+
             transform.parent.GetChild(0).gameObject.GetComponent<AmmoBox>().Close();
             Destroy(this.gameObject);
         }
@@ -62,7 +82,7 @@ public class RandomWeapon : Interactable
         
 
         // Randomly select a weapon
-        selectedWeaponIndex = Random.Range(0, weaponPrefabs.Length);
+        selectedWeaponIndex = UnityEngine.Random.Range(0, weaponPrefabs.Length);
         DisplayWeapon(selectedWeaponIndex); // Display the selected weapon
 
         isShuffling = false;

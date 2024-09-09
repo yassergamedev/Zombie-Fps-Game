@@ -57,6 +57,8 @@ public class Zombie : MonoBehaviour
     public bool activateRagDollOnDeath;
     public float raycastDistance = 0.5f; // Distance for raycasting to check for obstacles
     private WaveSystem waveSystem;
+
+    public bool isPassive;
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -216,7 +218,15 @@ public class Zombie : MonoBehaviour
         {
             AnimatorStateInfo stateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
 
-            yield return new WaitForSeconds(stateInfo.length / 2); // Wait until halfway through the animation
+            if (isPassive)
+            {
+                yield return new WaitForSeconds(stateInfo.length / 10); // Wait until 4th way through the animation
+            }
+            else
+            {
+                yield return new WaitForSeconds(stateInfo.length / 2); // Wait until halfway through the animation
+            }
+            
 
             if (playerHealth != null && Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
             {

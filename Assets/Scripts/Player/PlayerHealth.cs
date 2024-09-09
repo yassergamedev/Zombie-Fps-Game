@@ -135,7 +135,7 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    IEnumerator HealthRegenDelay()
+    public IEnumerator HealthRegenDelay()
     {
         // Wait for 4 seconds before starting health regeneration
         yield return new WaitForSeconds(healthRegenDelay);

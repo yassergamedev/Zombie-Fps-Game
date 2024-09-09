@@ -4,12 +4,14 @@ using UnityEngine.UI;
 using System.Collections;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 public class SettingsMenu : MonoBehaviour
 {
-    public Slider sensitivitySlider; // Reference to the Slider component
-    public TMP_Dropdown resolutionDropdown; // Reference to the Dropdown component
-    public Toggle fullscreenToggle; // Reference to the Toggle component
+    public Slider sensitivitySlider; // Reference to the Slider component for mouse sensitivity
+    public TMP_Dropdown resolutionDropdown; // Reference to the Dropdown component for resolution
+    public Toggle fullscreenToggle; // Reference to the Toggle component for fullscreen
+    public Slider volumeSlider; // Reference to the Slider component for sound volume
 
     public Animator transitionAnimator; // Reference to the Animator for the transition image
 
@@ -24,7 +26,8 @@ public class SettingsMenu : MonoBehaviour
 
         // Load and set initial values for UI elements
         sensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity", 1f);
-
+        volumeSlider.value = PlayerPrefs.GetFloat("Volume", 1f); // Load volume setting
+        AudioListener.volume = volumeSlider.value; // Adjust the volume of all audio sources in the scene
         // Populate resolutions dropdown
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
@@ -32,7 +35,7 @@ public class SettingsMenu : MonoBehaviour
         List<string> options = new List<string>();
         int currentResolutionIndex = 0;
 
-        for (int i = resolutions.Length -1, j = 0; i >= 0; i--, j++)
+        for (int i = resolutions.Length - 1, j = 0; i >= 0; i--, j++)
         {
             string option = resolutions[j].width + " x " + resolutions[j].height;
             options.Add(option);
@@ -54,6 +57,7 @@ public class SettingsMenu : MonoBehaviour
         sensitivitySlider.onValueChanged.AddListener(SetMouseSensitivity);
         resolutionDropdown.onValueChanged.AddListener(SetResolution);
         fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+        volumeSlider.onValueChanged.AddListener(SetVolume);
     }
 
     // Function to set the mouse sensitivity
@@ -76,6 +80,13 @@ public class SettingsMenu : MonoBehaviour
     {
         PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
         resolutionManager.SetScreenResolution(Screen.width, Screen.height, isFullscreen);
+    }
+
+    // Function to set the volume
+    public void SetVolume(float volume)
+    {
+        PlayerPrefs.SetFloat("Volume", volume);
+        AudioListener.volume = volume; // Adjust the volume of all audio sources in the scene
     }
 
     // Function to change scenes with a transition
@@ -113,8 +124,9 @@ public class SettingsMenu : MonoBehaviour
 
         Application.Quit();
     }
+
     public void QuitG()
     {
-        StartCoroutine (QuitGame());
+        StartCoroutine(QuitGame());
     }
 }
