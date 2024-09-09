@@ -40,6 +40,7 @@ public class Pause : MonoBehaviour
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             playerUI.PauseTimers();
+            AudioListener.volume = 0f;
         }
        
         
@@ -60,6 +61,7 @@ public class Pause : MonoBehaviour
         playerUI.ResumeTimers();
         GameObject.FindGameObjectWithTag("White Overlay").GetComponent<Image>().color = new UnityEngine.Color(1, 1, 1, 0);
         StartCoroutine(playerUI.gameObject.GetComponent<PlayerHealth>().HealthRegenDelay());
+        AudioListener.volume = PlayerPrefs.GetFloat("Volume", 1f);
     }
 
     void SetGameObjectsActive(bool isActive)
