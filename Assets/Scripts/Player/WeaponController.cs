@@ -46,7 +46,6 @@ public class WeaponController : MonoBehaviour
     private Quaternion recoilRotation;
     private Vector3 originalCameraPosition;
     private Quaternion originalCameraRotation;
-    public bool isRecoiling = false;
     public bool isFocusing = false;
 
     void Start()
@@ -77,6 +76,7 @@ public class WeaponController : MonoBehaviour
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && currentAmmo > 0)
         {
             if (!playerMovement.isSprinting) {
+                //Debug.Log(currentWeapon.gameObject.name + " is shooting");
                 nextTimeToFire = Time.time + currentWeapon.fireRate;
                 currentWeapon.Shoot(playerCamera, Vector3.zero, shakeAmount, this);
                 currentAmmo--;
@@ -86,13 +86,7 @@ public class WeaponController : MonoBehaviour
             // Apply recoil when shooting
             //ApplyRecoil(currentWeapon.recoilAmount);
         }
-        else
-        {
-            if (currentAmmo <= 0)
-            {
-                StartCoroutine(Reload());
-            }
-        }
+        
 
         if (Input.GetButton("Fire2") && !isReloading)
         {
@@ -242,7 +236,7 @@ public class WeaponController : MonoBehaviour
             currentAmmo = currentWeapon.currentAmmo;
            // currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
             //currentWeapon.currentAmmo = currentWeapon.maxAmmo;
-            player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
+            player.GetComponent<PlayerMovement>().weapon = weapons[currentWeaponIndex].weaponPrefab;
             weaponTransform = currentWeapon.gameObject.transform;
             // Store the original position and rotation from the weaponHolder
             originalPosition = weaponTransform.localPosition;
@@ -280,19 +274,7 @@ public class WeaponController : MonoBehaviour
         yield return new WaitForSeconds(0.05f);
         muzzleFlashLight.enabled = false;
     }
-    public void ApplyRecoil(Vector3 recoilAmount)
-    {
-        // Calculate the target rotation for recoil
-        Quaternion recoilTargetRotation = originalCameraRotation * Quaternion.Euler(recoilAmount);
-
-        // Apply the recoil rotation instantly
-        playerCamera.gameObject.transform.localRotation = recoilTargetRotation;
-
-        //   recoil flag to true if needed for other logic
-        isRecoiling = true;
-
-
-    }
+   
    
 
 }

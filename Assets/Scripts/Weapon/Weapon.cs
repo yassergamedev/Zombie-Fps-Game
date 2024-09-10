@@ -117,8 +117,7 @@ public class Weapon : MonoBehaviour
                             finalDamage *= zombie.headshotMultiplier;
                             if (!zombie.isDead)
                             playerInteract.AddPoints(pointsOnHit*2);
-                            // Deactivate the head's collider and mesh renderer
-                            hit.collider.gameObject.SetActive(false);
+                            
                         }
                         else
                         {

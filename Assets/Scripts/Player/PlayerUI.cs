@@ -120,10 +120,7 @@ public class PlayerUI : MonoBehaviour
         Destroy(animText, 2f);
     }
 
-    public void UpdateBulletCount(int newBulletCount)
-    {
-        UpdateAmmoText(newBulletCount, bulletImages.Count);
-    }
+  
 
     // New methods to control the InstaKill timer UI
 
