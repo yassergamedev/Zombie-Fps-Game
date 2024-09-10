@@ -239,8 +239,8 @@ public class WeaponController : MonoBehaviour
             weapons[currentWeaponIndex].weaponPrefab.SetActive(true);
 
             currentWeapon = weapons[currentWeaponIndex].weaponPrefab.GetComponent<Weapon>();
-            currentAmmo = currentWeapon.maxAmmo;
-            currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
+            currentAmmo = currentWeapon.currentAmmo;
+           // currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
             //currentWeapon.currentAmmo = currentWeapon.maxAmmo;
             player.GetComponent<PlayerMovement>().weapon = GameObject.FindGameObjectWithTag("Weapon");
             weaponTransform = currentWeapon.gameObject.transform;
