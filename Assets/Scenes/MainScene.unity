@@ -41554,15 +41554,15 @@ MonoBehaviour:
   - weaponPrefab: {fileID: 1847826417}
     isAvailable: 1
   - weaponPrefab: {fileID: 270271856}
-    isAvailable: 0
+    isAvailable: 1
   - weaponPrefab: {fileID: 716282528}
-    isAvailable: 0
+    isAvailable: 1
   - weaponPrefab: {fileID: 1281147522}
-    isAvailable: 0
+    isAvailable: 1
   - weaponPrefab: {fileID: 1127753308}
-    isAvailable: 0
+    isAvailable: 1
   - weaponPrefab: {fileID: 660939079}
-    isAvailable: 0
+    isAvailable: 1
   currentWeapon: {fileID: 0}
   player: {fileID: 1317685495282921293}
   crossHair: {fileID: 1152384440}

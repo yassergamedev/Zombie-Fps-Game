@@ -50,7 +50,7 @@ public class RandomWeapon : Interactable
                 weaponController.weapons[selectedWeaponIndex] = entry;
             }
 
-            weaponController.SwitchWeapon(selectedWeaponIndex);
+            weaponController.SwitchWeapon(selectedWeaponIndex,true);
 
 
             transform.parent.GetChild(0).gameObject.GetComponent<AmmoBox>().Close();

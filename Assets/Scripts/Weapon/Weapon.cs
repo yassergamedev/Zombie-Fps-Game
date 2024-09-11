@@ -213,7 +213,7 @@ public class Weapon : MonoBehaviour
             Debug.Log("No ammo in reserve or magazine already full.");
             if (this is RPG)
             {
-                controller.SwitchWeapon(0);
+                controller.SwitchWeapon(0, false);
             }
         }
     }

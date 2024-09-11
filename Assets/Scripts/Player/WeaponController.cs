@@ -58,7 +58,7 @@ public class WeaponController : MonoBehaviour
 
         playerCamera.fieldOfView = defaultFOV;
 
-        SwitchWeapon(0);
+        SwitchWeapon(0,false);
 
         currentPlayerUI = player.GetComponent<PlayerUI>();
         playerMovement = player.GetComponent<PlayerMovement>();
@@ -81,11 +81,19 @@ public class WeaponController : MonoBehaviour
                 currentWeapon.Shoot(playerCamera, Vector3.zero, shakeAmount, this);
                 currentAmmo--;
             }
-           
+
 
             // Apply recoil when shooting
             //ApplyRecoil(currentWeapon.recoilAmount);
         }
+        else
+        {
+            if(Input.GetButton("Fire1") && currentAmmo <= 0)
+            {
+                StartCoroutine(Reload());
+            }
+        }
+        
         
 
         if (Input.GetButton("Fire2") && !isReloading)
@@ -135,7 +143,7 @@ public class WeaponController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + (i - 1)))
             {
-                SwitchWeapon(i - 1); // Switch to weapon based on index (0-based)
+                SwitchWeapon(i - 1,false); // Switch to weapon based on index (0-based)
                 break;
             }
         }
@@ -219,7 +227,7 @@ public class WeaponController : MonoBehaviour
     }
 
 
-    public void SwitchWeapon(int weaponIndex)
+    public void SwitchWeapon(int weaponIndex, bool isMysteryBox)
     {
         if (weapons[weaponIndex].isAvailable)
         {
@@ -234,14 +242,23 @@ public class WeaponController : MonoBehaviour
 
             currentWeapon = weapons[currentWeaponIndex].weaponPrefab.GetComponent<Weapon>();
             currentAmmo = currentWeapon.currentAmmo;
-           // currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
-            //currentWeapon.currentAmmo = currentWeapon.maxAmmo;
+           
+            if(isMysteryBox)
+            {
+                currentWeapon.currentAmmo = currentWeapon.maxAmmo;
+                currentWeapon.ammoReserve = currentWeapon.normalAmmoReserve;
+
+            }
+               
             player.GetComponent<PlayerMovement>().weapon = weapons[currentWeaponIndex].weaponPrefab;
             weaponTransform = currentWeapon.gameObject.transform;
             // Store the original position and rotation from the weaponHolder
             originalPosition = weaponTransform.localPosition;
             originalRotation = weaponTransform.localRotation;
-            playerUI.UpdateAmmoText(currentAmmo, currentWeapon.ammoReserve);
+            if(!isMysteryBox)
+                playerUI.UpdateAmmoText(currentAmmo, currentWeapon.ammoReserve);
+            else
+                playerUI.UpdateAmmoText(currentWeapon.maxAmmo, currentWeapon.ammoReserve);
         }
     }
 
